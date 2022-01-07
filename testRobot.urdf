@@ -1,0 +1,479 @@
+<?xml version="1.0"?>
+<robot name="hexapod">
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.5 2 0.4"/>
+      </geometry>
+      <origin xyz="0 0 -0.125"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="1.6 2 0.25"/>
+      </geometry>
+      <origin xyz="0 0 -0.125"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="3.3854" ixy="0.0" ixz="0.0" iyy="4.6354" iyz="0.0" izz="1.3542"/>
+    </inertial>
+  </link>
+
+  <link name="FRP">
+    <visual>
+      <geometry>
+        <cylinder length="0.521" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 -4.01 0.78" xyz="0.1375 0.15 -0.1625"/>
+    </visual>
+  </link>
+  <link name="FRH">
+    <visual>
+      <geometry>
+        <cylinder length="0.775" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 -1.5708 0" xyz="0.3875 0 0"/>
+    </visual>
+    <visual>
+      <geometry>
+        <cylinder length="0.25" radius="0.05"/>
+      </geometry>
+      <origin rpy="1.5708 0 0" xyz="0.775 -0.125 0"/>
+    </visual>
+  </link>
+  <link name="FRK">
+    <visual>
+      <geometry>
+        <cylinder length="1.05" radius="0.05"/>
+      </geometry>
+      <origin xyz="0 -0.25 -0.525"/>
+    </visual>
+  </link>
+  <link name="FRT">
+    <visual>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <link name="MRP">
+    <visual>
+      <geometry>
+        <cylinder length="0.521" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 -4.01 0.78" xyz="0.1375 0.15 -0.1625"/>
+    </visual>
+  </link>
+  <link name="MRH">
+    <visual>
+      <geometry>
+        <cylinder length="0.775" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 -1.5708 0" xyz="0.3875 0 0"/>
+    </visual>
+    <visual>
+      <geometry>
+        <cylinder length="0.25" radius="0.05"/>
+      </geometry>
+      <origin rpy="1.5708 0 0" xyz="0.775 -0.125 0"/>
+    </visual>
+  </link>
+  <link name="MRK">
+    <visual>
+      <geometry>
+        <cylinder length="1.05" radius="0.05"/>
+      </geometry>
+      <origin xyz="0 -0.25 -0.525"/>
+    </visual>
+  </link>
+  <link name="MRT">
+    <visual>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <link name="BRP">
+    <visual>
+      <geometry>
+        <cylinder length="0.521" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 -4.01 0.78" xyz="0.1375 0.15 -0.1625"/>
+    </visual>
+  </link>
+  <link name="BRH">
+    <visual>
+      <geometry>
+        <cylinder length="0.775" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 -1.5708 0" xyz="0.3875 0 0"/>
+    </visual>
+    <visual>
+      <geometry>
+        <cylinder length="0.25" radius="0.05"/>
+      </geometry>
+      <origin rpy="1.5708 0 0" xyz="0.775 -0.125 0"/>
+    </visual>
+  </link>
+  <link name="BRK">
+    <visual>
+      <geometry>
+        <cylinder length="1.05" radius="0.05"/>
+      </geometry>
+      <origin xyz="0 -0.25 -0.525"/>
+    </visual>
+  </link>
+  <link name="BRT">
+    <visual>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <link name="FLP">
+    <visual>
+      <geometry>
+        <cylinder length="0.521" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 4.01 -0.78" xyz="-0.1375 0.15 -0.1625"/>
+    </visual>
+  </link>
+  <link name="FLH">
+    <visual>
+      <geometry>
+        <cylinder length="0.775" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 -1.5708 0" xyz="-0.3875 0 0"/>
+    </visual>
+    <visual>
+      <geometry>
+        <cylinder length="0.25" radius="0.05"/>
+      </geometry>
+      <origin rpy="-1.5708 0 0" xyz="-0.775 -0.125 0"/>
+    </visual>
+  </link>
+  <link name="FLK">
+    <visual>
+      <geometry>
+        <cylinder length="1.05" radius="0.05"/>
+      </geometry>
+      <origin xyz="0 -0.25 -0.525"/>
+    </visual>
+  </link>
+  <link name="FLT">
+    <visual>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <link name="MLP">
+    <visual>
+      <geometry>
+        <cylinder length="0.521" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 4.01 -0.78" xyz="-0.1375 0.15 -0.1625"/>
+    </visual>
+  </link>
+  <link name="MLH">
+    <visual>
+      <geometry>
+        <cylinder length="0.775" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 -1.5708 0" xyz="-0.3875 0 0"/>
+    </visual>
+    <visual>
+      <geometry>
+        <cylinder length="0.25" radius="0.05"/>
+      </geometry>
+      <origin rpy="-1.5708 0 0" xyz="-0.775 -0.125 0"/>
+    </visual>
+  </link>
+  <link name="MLK">
+    <visual>
+      <geometry>
+        <cylinder length="1.05" radius="0.05"/>
+      </geometry>
+      <origin xyz="0 -0.25 -0.525"/>
+    </visual>
+  </link>
+  <link name="MLT">
+    <visual>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <link name="BLP">
+    <visual>
+      <geometry>
+        <cylinder length="0.521" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 4.01 -0.78" xyz="-0.1375 0.15 -0.1625"/>
+    </visual>
+  </link>
+  <link name="BLH">
+    <visual>
+      <geometry>
+        <cylinder length="0.775" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 -1.5708 0" xyz="-0.3875 0 0"/>
+    </visual>
+    <visual>
+      <geometry>
+        <cylinder length="0.25" radius="0.05"/>
+      </geometry>
+      <origin rpy="-1.5708 0 0" xyz="-0.775 -0.125 0"/>
+    </visual>
+  </link>
+  <link name="BLK">
+    <visual>
+      <geometry>
+        <cylinder length="1.05" radius="0.05"/>
+      </geometry>
+      <origin xyz="0 -0.25 -0.525"/>
+    </visual>
+  </link>
+  <link name="BLT">
+    <visual>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <joint name="base_FRP" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="base_link"/>
+    <child link="FRP"/>
+    <origin rpy="0 0 0.7854" xyz="0.3825 0.814674 0"/>
+  </joint>
+  <joint name="FRP_FRH" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="FRP"/>
+    <child link="FRH"/>
+    <origin xyz="0.275 0.3 -0.325"/>
+  </joint>
+  <joint name="FRH_FRK" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="FRH"/>
+    <child link="FRK"/>
+    <origin xyz="0.775 0 0"/>
+  </joint>
+  <joint name="FRK_FRT" type="fixed">
+    <parent link="FRK"/>
+    <child link="FRT"/>
+    <origin xyz="0 -0.25 -1.05"/>
+  </joint>
+
+  <joint name="base_MRP" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="base_link"/>
+    <child link="MRP"/>
+    <origin xyz="0.625 0 0"/>
+  </joint>
+  <joint name="MRP_MRH" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="MRP"/>
+    <child link="MRH"/>
+    <origin xyz="0.275 0.3 -0.325"/>
+  </joint>
+  <joint name="MRH_MRK" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="MRH"/>
+    <child link="MRK"/>
+    <origin xyz="0.775 0 0"/>
+  </joint>
+  <joint name="MRK_MRT" type="fixed">
+    <parent link="MRK"/>
+    <child link="MRT"/>
+    <origin xyz="0 -0.25 -1.05"/>
+  </joint>
+
+  <joint name="base_BRP" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="base_link"/>
+    <child link="BRP"/>
+    <origin rpy="0 0 -0.7854" xyz="0.3825 -0.814674 0"/>
+  </joint>
+  <joint name="BRP_BRH" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="BRP"/>
+    <child link="BRH"/>
+    <origin xyz="0.275 0.3 -0.325"/>
+  </joint>
+  <joint name="BRH_BRK" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="BRH"/>
+    <child link="BRK"/>
+    <origin xyz="0.775 0 0"/>
+  </joint>
+  <joint name="BRK_BRT" type="fixed">
+    <parent link="BRK"/>
+    <child link="BRT"/>
+    <origin xyz="0 -0.25 -1.05"/>
+  </joint>
+
+
+  <joint name="base_FLP" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="base_link"/>
+    <child link="FLP"/>
+    <origin rpy="0 0 -0.7854" xyz="-0.3825 0.814674 0"/>
+  </joint>
+  <joint name="FLP_FLH" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="FLP"/>
+    <child link="FLH"/>
+    <origin xyz="-0.275 0.3 -0.325"/>
+  </joint>
+  <joint name="FLH_FLK" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="FLH"/>
+    <child link="FLK"/>
+    <origin xyz="-0.775 0 0"/>
+  </joint>
+  <joint name="FLK_FLT" type="fixed">
+    <parent link="FLK"/>
+    <child link="FLT"/>
+    <origin xyz="0 -0.25 -1.05"/>
+  </joint>
+
+  <joint name="base_MLP" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="base_link"/>
+    <child link="MLP"/>
+    <origin xyz="-0.625 0 0"/>
+  </joint>
+  <joint name="MLP_MLH" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="MLP"/>
+    <child link="MLH"/>
+    <origin xyz="-0.275 0.3 -0.325"/>
+  </joint>
+  <joint name="MLH_MLK" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="MLH"/>
+    <child link="MLK"/>
+    <origin xyz="-0.775 0 0"/>
+  </joint>
+  <joint name="MLK_MLT" type="fixed">
+    <parent link="MLK"/>
+    <child link="MLT"/>
+    <origin xyz="0 -0.25 -1.05"/>
+  </joint>
+
+  <joint name="base_BLP" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="base_link"/>
+    <child link="BLP"/>
+    <origin rpy="0 0 0.7854" xyz="-0.3825 -0.814674 0"/>
+  </joint>
+  <joint name="BLP_BLH" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="BLP"/>
+    <child link="BLH"/>
+    <origin xyz="-0.275 0.3 -0.325"/>
+  </joint>
+  <joint name="BLH_BLK" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="BLH"/>
+    <child link="BLK"/>
+    <origin xyz="-0.775 0 0"/>
+  </joint>
+  <joint name="BLK_BLT" type="fixed">
+    <parent link="BLK"/>
+    <child link="BLT"/>
+    <origin xyz="0 -0.25 -1.05"/>
+  </joint>
+
+</robot>
