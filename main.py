@@ -97,7 +97,7 @@ physicsClient = p.connect(p.GUI)
 p.setAdditionalSearchPath(pybullet_data.getDataPath())
 p.setGravity(0, 0, -9.8)
 planeId = p.loadURDF("plane.urdf")
-hexapod_ID = p.loadURDF("testRobot.urdf", [0, 0, 1.4], p.getQuaternionFromEuler([0, 0, 0]))
+hexapod_ID = p.loadURDF("robot.urdf", [0, 0, 1.4], p.getQuaternionFromEuler([0, 0, 0]))
 
 control_IDs = []
 servoRangeOfMotion = math.pi * 3 / 4
