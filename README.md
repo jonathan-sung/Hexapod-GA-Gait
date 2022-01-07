@@ -1,4 +1,4 @@
-# Hexapod-GA-Gait
+# Hexapod Walking Gait - Genetic Algorithms (GA)
 
 4th Year Honours Project
 
