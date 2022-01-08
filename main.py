@@ -4,6 +4,66 @@ import numpy as np
 import pybullet_data
 import time
 import bezier
+from enum import Enum
+import abc
+
+
+class MotionType(Enum):
+    NONE = 0
+    LINE = 1
+    CURVE = 2
+
+
+class Gait:
+
+    def __init__(self, duration):
+        self.duration = duration
+        self.legSequences = []
+        for j in range(6):
+            ls = LegSequence(duration)
+            self.legSequences.append(ls)
+
+
+class LegSequence:
+    def __init__(self, duration, restPos):
+        self.duration = duration
+        self.motions = []
+
+    def evaluate(self, progress):
+        return [0.0, 0.0, 0.0]
+
+
+class Motion(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def evaluate(self, x):
+        pass
+
+
+class BezierMotion(Motion):
+    def __init__(self, knots):
+        self.knots = knots
+        nodes = np.array([[self.knots[0][0], self.knots[1][0], self.knots[2][0], self.knots[3][0]],
+                          [self.knots[0][1], self.knots[1][1], self.knots[2][1], self.knots[3][1]],
+                          [self.knots[0][2], self.knots[1][2], self.knots[2][2], self.knots[3][2]]])
+        self.curve = bezier.Curve(nodes, degree=3)
+
+    def evaluate(self, x):
+        np.array(self.curve.evaluate(x % 1))
+
+
+class LineMotion(Motion):
+    def __init__(self, startPoint, endPoint):
+        self.startPoint = startPoint
+        self.endPoint = endPoint
+
+    def evaluate(self, x):
+        a = self.endPoint[0] - self.startPoint[0]
+        b = self.endPoint[1] - self.startPoint[1]
+        c = self.endPoint[2] - self.startPoint[2]
+        u = self.startPoint[0] + abs(a) * x
+        v = self.startPoint[1] + abs(b) * x
+        w = self.startPoint[2] + abs(c) * x
+        return [u, v, w]
 
 
 def init_debug_parameters():
@@ -37,7 +97,7 @@ def calculateIK2():
 
     # bezier curve
     # nodes1 = np.array([[1.0, 1.5, 0.5, 0.0], [0.0, 0.5, 1.0, 0.0]])
-    nodes1 = np.array([[0.8, 1.2, 0.0, 0.0], [-0.5, 0.5, 1.5, 0.5], [0.0, 1.0, 0.5, 0.0]])
+    nodes1 = np.array([[0, 0, 0.0, 0.0], [-0.5, 0.5, 1.5, 0.5], [0.0, 1.0, 0.5, 0.0]])
     curve1 = bezier.Curve(nodes1, degree=3)
 
     for j in range(6):
@@ -49,7 +109,8 @@ def calculateIK2():
             curve_size = 0.5
             bezier_curve_pos = np.array(curve1.evaluate((dt * curve_speed) % 1)) * curve_size
             print(bezier_curve_pos)
-            local_target_pos.append((np.array([bezier_curve_pos[0][0], bezier_curve_pos[1][0], bezier_curve_pos[2][0]])))
+            local_target_pos.append(
+                (np.array([bezier_curve_pos[0][0], bezier_curve_pos[1][0], bezier_curve_pos[2][0]])))
         else:
             local_target_pos.append(debug_parameters)
             # local_target_pos.append([0,0,-0.5])
