@@ -4,14 +4,7 @@ import numpy as np
 import pybullet_data
 import time
 import bezier
-from enum import Enum
 import abc
-
-
-class MotionType(Enum):
-    NONE = 0
-    LINE = 1
-    CURVE = 2
 
 
 class Gait:
@@ -26,7 +19,7 @@ class Gait:
     def evaluate(self, elapsed_time):
         leg_positions = []
         for ls in self.legSequences:
-            leg_positions.append(ls.evaluate(elapsed_time / self.duration))
+            leg_positions.append(ls.evaluate((elapsed_time % self.duration) / self.duration))
         return leg_positions
 
 
@@ -52,6 +45,7 @@ class LegSequence:
             if j < (len(self.motions) - 1):
                 next_time = self.motions[j + 1][0]
             if progress >= motion_start_time:
+
                 # Convert global progress into local-progress of given motion
                 local_progress = (progress - motion_start_time) / (next_time - motion_start_time)
                 return self.motions[j][1].evaluate(local_progress)
@@ -69,23 +63,31 @@ class BezierMotion(Motion):
     def __init__(self, knots):
         self.knots = knots
         self.curve = bezier.Curve(self.knots, degree=3)
+        self.velocity_curve = bezier.Curve(np.array([[0.0, 0.5, 0.5, 1.0], [0.0, 0.5, 0.5, 1.0]]), degree=3)
 
     def evaluate(self, progress):
-        return self.curve.evaluate(progress % 1)
+        # velocity curve: y=a+\frac{b}{\left(sx+1\right)^{7}}
+        # progress = 1 + -(1 / math.pow((progress + 1), 7))
+        curved_progress = self.velocity_curve.evaluate(progress)
+        return self.curve.evaluate(curved_progress[1][0] % 1)
 
 
 class LineMotion(Motion):
     def __init__(self, startPoint, endPoint):
         self.startPoint = startPoint
         self.endPoint = endPoint
+        self.velocity_curve = bezier.Curve(np.array([[0.0, 1.0, 1.0, 1.0], [0.0, 0.0, 0.0, 1.0]]), degree=3)
 
+    # Parametric equation of a straight line given a progression percentage
     def evaluate(self, progress):
-        # Parametric equation of a straight line given a progression percentage
-        # Return current coordinate
-        x = self.startPoint[0] + (self.endPoint[0] - self.startPoint[0]) * progress
-        y = self.startPoint[1] + (self.endPoint[1] - self.startPoint[1]) * progress
-        z = self.startPoint[2] + (self.endPoint[2] - self.startPoint[2]) * progress
-        # print("line evaluated")
+
+        # velocity curve: y=a+\frac{b}{\left(sx+1\right)^{7}}
+        # progress = 1 + -(1 / math.pow((progress + 1), 7))
+
+        curved_progress = self.velocity_curve.evaluate(progress)
+        x = self.startPoint[0] + (self.endPoint[0] - self.startPoint[0]) * curved_progress[1][0]
+        y = self.startPoint[1] + (self.endPoint[1] - self.startPoint[1]) * curved_progress[1][0]
+        z = self.startPoint[2] + (self.endPoint[2] - self.startPoint[2]) * curved_progress[1][0]
         return [x, y, z]
 
 
@@ -101,58 +103,6 @@ def read_debug_parameters():
     for x in control_IDs:
         angles.append(p.readUserDebugParameter(x))
     return angles
-
-
-def calculateIK2():
-    debug_parameters = np.array([
-        p.readUserDebugParameter(xPara),
-        p.readUserDebugParameter(yPara),
-        p.readUserDebugParameter(zPara)])
-
-    pos_body = np.array(p.getBasePositionAndOrientation(hexapod_ID)[0])
-    orn_body = p.getBasePositionAndOrientation(hexapod_ID)[1]
-
-    speed = 3
-    rest_poses = []
-    local_target_pos = []
-    translated_pos = []
-    target_pos = []
-
-    # bezier curve
-    # nodes1 = np.array([[1.0, 1.5, 0.5, 0.0], [0.0, 0.5, 1.0, 0.0]])
-    nodes1 = np.array([[0, 0, 0.0, 0.0], [-0.5, 0.5, 1.5, 0.5], [0.0, 1.0, 0.5, 0.0]])
-    curve1 = bezier.Curve(nodes1, degree=3)
-
-    for j in range(6):
-        rest_poses.append(
-            pos_body + p.multiplyTransforms([0, 0, 0], orn_body, baseToEndEffectorConstVec[j], [0, 0, 0, 1])[0])
-        # local_target_pos.append((np.array([math.cos(-dt * speed), math.sin(-dt * speed), 0]) * 0.4) + debug_parameters)
-        if j == 0 or j == 2 or j == 4:
-            curve_speed = 0.25
-            curve_size = 0.5
-            bezier_curve_pos = np.array(curve1.evaluate((dt * curve_speed) % 1)) * curve_size
-            # print(bezier_curve_pos)
-            local_target_pos.append(
-                (np.array([bezier_curve_pos[0][0], bezier_curve_pos[1][0], bezier_curve_pos[2][0]])))
-        else:
-            local_target_pos.append(debug_parameters)
-            # local_target_pos.append([0,0,-0.5])
-
-        translated_pos.append(p.multiplyTransforms(rest_poses[j], orn_body, local_target_pos[j], [0, 0, 0, 1]))
-        target_pos.append(translated_pos[j][0])
-
-    ik = p.calculateInverseKinematics2(
-        hexapod_ID,
-        ([x for x in range(3, 24, 4)]),
-        target_pos,
-        solver=p.IK_DLS,
-        lowerLimits=ll,
-        upperLimits=ul,
-        jointRanges=jr,
-        restPoses=rest_poses,
-        jointDamping=jd
-    )
-    return ik
 
 
 def calculateIK3(feet_positions):
@@ -254,23 +204,16 @@ for i in range(6):
 lastTime = time.time()
 
 # Gait test
-gaitDuration = 1
+gaitDuration = 3
 testGait = Gait(gaitDuration)
-print(testGait.evaluate(3 % gaitDuration))
-
-lm = LineMotion([0, 0, 0], [2, 2, 2])
-bm = BezierMotion(np.array([[0, 0, 0.0, 0.0], [-0.5, 0.5, 1.5, 0.5], [0.0, 1.0, 0.5, 0.0]]))
-
-# print(lm.evaluate(0.4))
-# print(bm.evaluate(0.4))
 
 while True:
     dt = time.time() - lastTime
-    setServoStatesLegs(testGait.evaluate(dt % gaitDuration))
+    setServoStatesLegs(testGait.evaluate(dt))
 
     for i in range(6):
         currentPos[i] = p.getLinkState(hexapod_ID, (4 * i) + 3)[0]
-        # p.addUserDebugLine(prevPos[i], currentPos[i], [0, 0, 0.3], 4, 5)
+        p.addUserDebugLine(prevPos[i], currentPos[i], [0, 0, 0.3], 4, gaitDuration)
         prevPos[i] = currentPos[i]
     p.setRealTimeSimulation(1)
     # p.stepSimulation()
