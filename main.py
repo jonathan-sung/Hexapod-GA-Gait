@@ -6,6 +6,8 @@ import time
 import bezier
 import abc
 
+# roslaunch urdf_tutorial display.launch model:='D:\Programming\Python\Hexapod-GA-Gait\robot.urdf'
+
 
 class Gait:
 
@@ -27,14 +29,20 @@ class LegSequence:
     def __init__(self, duration, cheese):
         self.duration = duration
         self.motions = []
+        startPos = [0.0, -0.75, 0.0]
+        knot1 = [0.0, 0.5, 0.5]
+        knot2 = [0.0, 1.0, 0.25]
+        endPos = [0.0, 0.75, 0.0]
         if cheese == 0:
             self.motions.append(
-                (0.0, BezierMotion(np.array([[0, 0, 0.0, 0.0], [-0.5, 0.5, 1.5, 0.5], [0.0, 1.0, 0.5, 0.0]]))))
-            self.motions.append((0.5, LineMotion([0.0, 0.5, 0.0], [0.0, -0.5, 0.0])))
+                (0.0, BezierMotion(
+                    np.array([[startPos[0], knot1[0], knot2[0], endPos[0]], [startPos[1], knot1[1], knot2[1], endPos[1]], [startPos[2], knot1[2], knot2[2], endPos[2]]]))))
+            self.motions.append((0.5, LineMotion(endPos, startPos)))
         else:
-            self.motions.append((0.0, LineMotion([0.0, 0.5, 0.0], [0.0, -0.5, 0.0])))
+            self.motions.append((0.0, LineMotion(endPos, startPos)))
             self.motions.append(
-                (0.5, BezierMotion(np.array([[0, 0, 0.0, 0.0], [-0.5, 0.5, 1.5, 0.5], [0.0, 1.0, 0.5, 0.0]]))))
+                (0.5, BezierMotion(
+                    np.array([[startPos[0], knot1[0], knot2[0], endPos[0]], [startPos[1], knot1[1], knot2[1], endPos[1]], [startPos[2], knot1[2], knot2[2], endPos[2]]]))))
 
     def evaluate(self, progress):
         # for-loop to loop around every motion to return motion for a given amount of progress
@@ -45,7 +53,6 @@ class LegSequence:
             if j < (len(self.motions) - 1):
                 next_time = self.motions[j + 1][0]
             if progress >= motion_start_time:
-
                 # Convert global progress into local-progress of given motion
                 local_progress = (progress - motion_start_time) / (next_time - motion_start_time)
                 return self.motions[j][1].evaluate(local_progress)
@@ -80,7 +87,6 @@ class LineMotion(Motion):
 
     # Parametric equation of a straight line given a progression percentage
     def evaluate(self, progress):
-
         # velocity curve: y=a+\frac{b}{\left(sx+1\right)^{7}}
         # progress = 1 + -(1 / math.pow((progress + 1), 7))
 
@@ -171,7 +177,7 @@ physicsClient = p.connect(p.GUI)
 p.setAdditionalSearchPath(pybullet_data.getDataPath())
 p.setGravity(0, 0, -9.8)
 planeId = p.loadURDF("plane.urdf")
-hexapod_ID = p.loadURDF("robot.urdf", [0, 0, 1.4], p.getQuaternionFromEuler([0, 0, 0]))
+hexapod_ID = p.loadURDF("robot.urdf", [0, 0, 1.4], [0, 0, 0, 1])
 
 control_IDs = []
 servoRangeOfMotion = math.pi * 3 / 4
@@ -182,14 +188,12 @@ ll = ([-servoRangeOfMotion] * 3) + ([0] * 15)  # lowerLimit
 ul = ([servoRangeOfMotion] * 3) + ([0] * 15)  # upperLimit
 jr = ([servoRangeOfMotion] * 3) + ([0] * 15)  # jointRange
 rp = ([0] * 18)  # restPos
-jd = ([5] * 18)  # jointDamping (like a PID controller)
+jd = ([3] * 18)  # jointDamping
 
 baseToEndEffectorConstVec = []
 for i in range(3, 24, 4):
     baseToEndEffectorConstVec.append(
         np.array(p.getLinkState(hexapod_ID, i)[4]) - np.array(p.getBasePositionAndOrientation(hexapod_ID)[0]))
-
-testLegID = 3
 
 xPara = p.addUserDebugParameter("X", -3, 3, 0)
 yPara = p.addUserDebugParameter("Y", -3, 3, 0)
@@ -204,7 +208,7 @@ for i in range(6):
 lastTime = time.time()
 
 # Gait test
-gaitDuration = 3
+gaitDuration = 2
 testGait = Gait(gaitDuration)
 
 while True:

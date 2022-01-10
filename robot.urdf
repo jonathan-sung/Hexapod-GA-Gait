@@ -50,17 +50,23 @@
     </visual>
   </link>
   <link name="FRT">
+    <contact>
+      <stiffness value="100000"/>
+      <damping value="10"/>
+      <lateral_friction value="1.5"/>
+    </contact>
     <visual>
       <geometry>
         <sphere radius="0.05"/>
       </geometry>
-      <origin xyz="0 0 0.025"/>
+      <origin xyz="0 0 0.05"/>
     </visual>
     <collision>
       <geometry>
         <sphere radius="0.05"/>
       </geometry>
-      <origin xyz="0 0 0.025"/>
+      <origin xyz="0 0 0.05"/>
+      <contact_coefficients mu="100" />
     </collision>
     <inertial>
       <mass value="0.5"/>
@@ -99,17 +105,22 @@
     </visual>
   </link>
   <link name="MRT">
+    <contact>
+      <stiffness value="100000"/>
+      <damping value="10"/>
+      <lateral_friction value="1.5"/>
+    </contact>
     <visual>
       <geometry>
         <sphere radius="0.05"/>
       </geometry>
-      <origin xyz="0 0 0.025"/>
+      <origin xyz="0 0 0.05"/>
     </visual>
     <collision>
       <geometry>
         <sphere radius="0.05"/>
       </geometry>
-      <origin xyz="0 0 0.025"/>
+      <origin xyz="0 0 0.05"/>
     </collision>
     <inertial>
       <mass value="0.5"/>
@@ -148,17 +159,22 @@
     </visual>
   </link>
   <link name="BRT">
+    <contact>
+      <stiffness value="100000"/>
+      <damping value="10"/>
+      <lateral_friction value="1.5"/>
+    </contact>
     <visual>
       <geometry>
         <sphere radius="0.05"/>
       </geometry>
-      <origin xyz="0 0 0.025"/>
+      <origin xyz="0 0 0.05"/>
     </visual>
     <collision>
       <geometry>
         <sphere radius="0.05"/>
       </geometry>
-      <origin xyz="0 0 0.025"/>
+      <origin xyz="0 0 0.05"/>
     </collision>
     <inertial>
       <mass value="0.5"/>
@@ -197,17 +213,22 @@
     </visual>
   </link>
   <link name="FLT">
+    <contact>
+      <stiffness value="100000"/>
+      <damping value="10"/>
+      <lateral_friction value="1.5"/>
+    </contact>
     <visual>
       <geometry>
         <sphere radius="0.05"/>
       </geometry>
-      <origin xyz="0 0 0.025"/>
+      <origin xyz="0 0 0.05"/>
     </visual>
     <collision>
       <geometry>
         <sphere radius="0.05"/>
       </geometry>
-      <origin xyz="0 0 0.025"/>
+      <origin xyz="0 0 0.05"/>
     </collision>
     <inertial>
       <mass value="0.5"/>
@@ -246,17 +267,22 @@
     </visual>
   </link>
   <link name="MLT">
+    <contact>
+      <stiffness value="100000"/>
+      <damping value="10"/>
+      <lateral_friction value="1.5"/>
+    </contact>
     <visual>
       <geometry>
         <sphere radius="0.05"/>
       </geometry>
-      <origin xyz="0 0 0.025"/>
+      <origin xyz="0 0 0.05"/>
     </visual>
     <collision>
       <geometry>
         <sphere radius="0.05"/>
       </geometry>
-      <origin xyz="0 0 0.025"/>
+      <origin xyz="0 0 0.05"/>
     </collision>
     <inertial>
       <mass value="0.5"/>
@@ -295,17 +321,22 @@
     </visual>
   </link>
   <link name="BLT">
+    <contact>
+      <stiffness value="100000"/>
+      <damping value="10"/>
+      <lateral_friction value="1.5"/>
+    </contact>
     <visual>
       <geometry>
         <sphere radius="0.05"/>
       </geometry>
-      <origin xyz="0 0 0.025"/>
+      <origin xyz="0 0 0.05"/>
     </visual>
     <collision>
       <geometry>
         <sphere radius="0.05"/>
       </geometry>
-      <origin xyz="0 0 0.025"/>
+      <origin xyz="0 0 0.05"/>
     </collision>
     <inertial>
       <mass value="0.5"/>
