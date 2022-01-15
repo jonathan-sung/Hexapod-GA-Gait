@@ -5,8 +5,22 @@ import pybullet_data
 import time
 import bezier
 import abc
+import serial
+
+global counter
+
 
 # roslaunch urdf_tutorial display.launch model:='D:\Programming\Python\Hexapod-GA-Gait\robot.urdf'
+def radToPwm(angle):
+    return ((2000 * angle) / math.pi) + 1500
+
+
+# def updateRealServos():
+#     if counter >= SUF / 1000:
+#         ssc32.write(
+#             f'#0P{radToPwm(-p.getJointState(hexapod_ID, 8)[0])}T{SUF}#1P{radToPwm(p.getJointState(hexapod_ID, 9)[0])}T{SUF}#2P{radToPwm(-p.getJointState(hexapod_ID, 10)[0])}T{SUF}\r'.encode(
+#                 'utf-8'))
+#         counter = 0
 
 
 class Gait:
@@ -15,7 +29,7 @@ class Gait:
         self.duration = duration
         self.legSequences = []
         for j in range(6):
-            ls = LegSequence(duration, (j % 2))
+            ls = LegSequence(duration, j)
             self.legSequences.append(ls)
 
     def evaluate(self, elapsed_time):
@@ -26,38 +40,45 @@ class Gait:
 
 
 class LegSequence:
-    def __init__(self, duration, cheese):
+    def __init__(self, duration, legID):
         self.duration = duration
         self.motions = []
-        startPos = [0.0, -0.75, 0.0]
-        knot1 = [0.0, 0.5, 0.5]
+        startPos = [0.0, -0.5, 0.0]
+        knot1 = [0.0, 0.5, 1.0]
         knot2 = [0.0, 1.0, 0.25]
-        endPos = [0.0, 0.75, 0.0]
-        if cheese == 0:
+        endPos = [0.0, 0.5, 0.0]
+        print(f'legid: {legID}')
+        if legID % 2:
             self.motions.append(
                 (0.0, BezierMotion(
-                    np.array([[startPos[0], knot1[0], knot2[0], endPos[0]], [startPos[1], knot1[1], knot2[1], endPos[1]], [startPos[2], knot1[2], knot2[2], endPos[2]]]))))
+                    np.array(
+                        [[startPos[0], knot1[0], knot2[0], endPos[0]], [startPos[1], knot1[1], knot2[1], endPos[1]],
+                         [startPos[2], knot1[2], knot2[2], endPos[2]]]))))
             self.motions.append((0.5, LineMotion(endPos, startPos)))
         else:
             self.motions.append((0.0, LineMotion(endPos, startPos)))
             self.motions.append(
                 (0.5, BezierMotion(
-                    np.array([[startPos[0], knot1[0], knot2[0], endPos[0]], [startPos[1], knot1[1], knot2[1], endPos[1]], [startPos[2], knot1[2], knot2[2], endPos[2]]]))))
+                    np.array(
+                        [[startPos[0], knot1[0], knot2[0], endPos[0]], [startPos[1], knot1[1], knot2[1], endPos[1]],
+                         [startPos[2], knot1[2], knot2[2], endPos[2]]]))))
+            # self.motions.append((0.75, NoMotion(self.motions[-1][1].evaluate(1.0))))
+        self.motions.sort()
 
     def evaluate(self, progress):
         # for-loop to loop around every motion to return motion for a given amount of progress
         for j in range(len(self.motions) - 1, -1, -1):
             # print(f'j: {j}')
             motion_start_time = self.motions[j][0]
-            next_time = 1
-            if j < (len(self.motions) - 1):
-                next_time = self.motions[j + 1][0]
-            if progress >= motion_start_time:
+            end_time = self.motions[(j + 1) % (len(self.motions))][0]
+            loop_back = (motion_start_time >= end_time)
+            end_time += loop_back  # end of cycle motion loop back around
+            if motion_start_time <= progress < end_time:
                 # Convert global progress into local-progress of given motion
-                local_progress = (progress - motion_start_time) / (next_time - motion_start_time)
+                local_progress = (progress - motion_start_time) / (end_time - motion_start_time)
                 return self.motions[j][1].evaluate(local_progress)
 
-        return [[0.0], [0.0], [0.0]]
+        return [[0.0], 0.0, 0.0]
 
 
 class Motion(metaclass=abc.ABCMeta):
@@ -90,11 +111,19 @@ class LineMotion(Motion):
         # velocity curve: y=a+\frac{b}{\left(sx+1\right)^{7}}
         # progress = 1 + -(1 / math.pow((progress + 1), 7))
 
-        curved_progress = self.velocity_curve.evaluate(progress)
+        curved_progress = self.velocity_curve.evaluate(progress % 1)
         x = self.startPoint[0] + (self.endPoint[0] - self.startPoint[0]) * curved_progress[1][0]
         y = self.startPoint[1] + (self.endPoint[1] - self.startPoint[1]) * curved_progress[1][0]
         z = self.startPoint[2] + (self.endPoint[2] - self.startPoint[2]) * curved_progress[1][0]
         return [x, y, z]
+
+
+class NoMotion(Motion):
+    def __init__(self, evaluationConst):
+        self.evaluationConst = evaluationConst
+
+    def evaluate(self, progress):
+        return self.evaluationConst
 
 
 def init_debug_parameters():
@@ -181,7 +210,7 @@ hexapod_ID = p.loadURDF("robot.urdf", [0, 0, 1.4], [0, 0, 0, 1])
 
 control_IDs = []
 servoRangeOfMotion = math.pi * 3 / 4
-# init_debug_parameters()
+init_debug_parameters()
 
 # setup IK parameters
 ll = ([-servoRangeOfMotion] * 3) + ([0] * 15)  # lowerLimit
@@ -195,7 +224,7 @@ for i in range(3, 24, 4):
     baseToEndEffectorConstVec.append(
         np.array(p.getLinkState(hexapod_ID, i)[4]) - np.array(p.getBasePositionAndOrientation(hexapod_ID)[0]))
 
-xPara = p.addUserDebugParameter("X", -3, 3, 0)
+xPara = p.addUserDebugParameter("X", -2, 2, 0)
 yPara = p.addUserDebugParameter("Y", -3, 3, 0)
 zPara = p.addUserDebugParameter("Z", -3, 3, 0)
 rotationPara = p.addUserDebugParameter("Rotation", -math.pi, math.pi, 0)
@@ -205,22 +234,43 @@ currentPos = [0, 0, 0, 0, 0, 0]
 for i in range(6):
     prevPos.append(p.getLinkState(hexapod_ID, (4 * i) + 3)[0])
 
-lastTime = time.time()
+programStartTime = time.time()
+lastTime = programStartTime
 
 # Gait test
 gaitDuration = 2
 testGait = Gait(gaitDuration)
 
+# PySerial init
+ssc32 = serial.Serial('COM5', 9600, timeout=5)  # open serial port
+counter = 0
+SUF = 200  # servo update frequency in ms - e.g. update servo every 20ms
+
 while True:
-    dt = time.time() - lastTime
-    setServoStatesLegs(testGait.evaluate(dt))
+    # Update timing variables
+    now = time.time()
+    runTime = now - programStartTime
+    dt = now - lastTime
+    counter += dt
+    lastTime = now
+
+    # setServoStatesManual()
+    setServoStatesLegs(testGait.evaluate(runTime))
+    # updateRealServos()
+    # if counter >= SUF / 1000:
+    #     ssc32.write(
+    #         f'#0P{radToPwm(-p.getJointState(hexapod_ID, 8)[0])}T{SUF}#1P{radToPwm(p.getJointState(hexapod_ID, 9)[0])}T{SUF}#2P{radToPwm(-p.getJointState(hexapod_ID, 10)[0])}T{SUF}\r'.encode(
+    #             'utf-8'))
+    #     counter = 0
+    # ssc32.write(
+    #     f'#0P{radToPwm(-p.getJointState(hexapod_ID, 8)[0])}T{SUF}#1P{radToPwm(p.getJointState(hexapod_ID, 9)[0])}T{SUF}#2P{radToPwm(-p.getJointState(hexapod_ID, 10)[0])}T{SUF}\r'.encode(
+    #         'utf-8'))
 
     for i in range(6):
         currentPos[i] = p.getLinkState(hexapod_ID, (4 * i) + 3)[0]
         p.addUserDebugLine(prevPos[i], currentPos[i], [0, 0, 0.3], 4, gaitDuration)
         prevPos[i] = currentPos[i]
     p.setRealTimeSimulation(1)
-    # p.stepSimulation()
-    # time.sleep(1. / 240.)
 
+ssc32.close()  # close port
 p.disconnect(physicsClient)
