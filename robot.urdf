@@ -53,7 +53,7 @@
     <contact>
       <stiffness value="100000"/>
       <damping value="10"/>
-      <lateral_friction value="1.5"/>
+      <lateral_friction value="10.0"/>
     </contact>
     <visual>
       <geometry>
@@ -108,7 +108,7 @@
     <contact>
       <stiffness value="100000"/>
       <damping value="10"/>
-      <lateral_friction value="1.5"/>
+      <lateral_friction value="10.0"/>
     </contact>
     <visual>
       <geometry>
@@ -162,7 +162,7 @@
     <contact>
       <stiffness value="100000"/>
       <damping value="10"/>
-      <lateral_friction value="1.5"/>
+      <lateral_friction value="10.0"/>
     </contact>
     <visual>
       <geometry>
@@ -216,7 +216,7 @@
     <contact>
       <stiffness value="100000"/>
       <damping value="10"/>
-      <lateral_friction value="1.5"/>
+      <lateral_friction value="10.0"/>
     </contact>
     <visual>
       <geometry>
@@ -270,7 +270,7 @@
     <contact>
       <stiffness value="100000"/>
       <damping value="10"/>
-      <lateral_friction value="1.5"/>
+      <lateral_friction value="10.0"/>
     </contact>
     <visual>
       <geometry>
@@ -324,7 +324,7 @@
     <contact>
       <stiffness value="100000"/>
       <damping value="10"/>
-      <lateral_friction value="1.5"/>
+      <lateral_friction value="10.0"/>
     </contact>
     <visual>
       <geometry>
