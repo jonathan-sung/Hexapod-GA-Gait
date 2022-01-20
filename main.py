@@ -11,6 +11,7 @@ import itertools
 
 
 # roslaunch urdf_tutorial display.launch model:='D:\Programming\Python\Hexapod-GA-Gait\robot.urdf'
+# roslaunch urdf_tutorial display.launch model:='D:\Programming\Python\Hexapod-GA-Gait\crab_description\models\crab_model.urdf'
 
 
 class Gait:
@@ -272,6 +273,7 @@ p.setAdditionalSearchPath(pybullet_data.getDataPath())
 p.setGravity(0, 0, -9.8)
 planeId = p.loadURDF("plane.urdf")
 hexapod_ID = p.loadURDF("robot.urdf", [0, 0, 1.4], [0, 0, 0, 1])
+# hexapod_ID = p.loadURDF("crab_description/models/crab_model.urdf", [0, 0, 1.4], [0, 0, 0, 1])
 
 control_IDs = []
 servoRangeOfMotion = math.pi * 3 / 4
