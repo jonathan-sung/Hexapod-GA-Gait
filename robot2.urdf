@@ -1,0 +1,534 @@
+<?xml version="1.0"?>
+<robot name="hexapod">
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/thorax.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+      <origin xyz="0 0 -0.25" rpy="0 0 1.57"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="1.6 2 0.25"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="3.3854" ixy="0.0" ixz="0.0" iyy="4.6354" iyz="0.0" izz="1.3542"/>
+    </inertial>
+  </link>
+
+  <link name="FRP">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/coxa_r.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+      <origin xyz="0 0 -0.25"/>
+    </visual>
+  </link>
+  <link name="FRH">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/femur_r.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="green">
+        <color rgba="0 1 0 1"/>
+      </material>
+      <origin rpy="-1.57 0 0" xyz="0 -0.2 0"/>
+    </visual>
+  </link>
+  <link name="FRK">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/tibia_r.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 1"/>
+      </material>
+      <origin rpy="1.57 1.57 0" xyz="0 -0.2 0"/>
+    </visual>
+  </link>
+  <link name="FRT">
+    <contact>
+      <stiffness value="100000"/>
+      <damping value="10"/>
+      <lateral_friction value="1.0"/>
+    </contact>
+    <visual>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+      <contact_coefficients mu="100" />
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <link name="MRP">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/coxa_r.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+      <origin xyz="0 0 -0.25"/>
+    </visual>
+  </link>
+  <link name="MRH">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/femur_r.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="green">
+        <color rgba="0 1 0 1"/>
+      </material>
+      <origin rpy="-1.57 0 0" xyz="0 -0.2 0"/>
+    </visual>
+  </link>
+  <link name="MRK">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/tibia_r.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 1"/>
+      </material>
+      <origin rpy="1.57 1.57 0" xyz="0 -0.2 0"/>
+    </visual>
+  </link>
+  <link name="MRT">
+    <contact>
+      <stiffness value="100000"/>
+      <damping value="10"/>
+      <lateral_friction value="1.0"/>
+    </contact>
+    <visual>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <link name="BRP">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/coxa_r.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+      <origin xyz="0 0 -0.25"/>
+    </visual>
+  </link>
+  <link name="BRH">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/femur_r.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="green">
+        <color rgba="0 1 0 1"/>
+      </material>
+      <origin rpy="-1.57 0 0" xyz="0 -0.2 0"/>
+    </visual>
+  </link>
+  <link name="BRK">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/tibia_r.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 1"/>
+      </material>
+      <origin rpy="1.57 1.57 0" xyz="0 -0.2 0"/>
+    </visual>
+  </link>
+  <link name="BRT">
+    <contact>
+      <stiffness value="100000"/>
+      <damping value="10"/>
+      <lateral_friction value="1.0"/>
+    </contact>
+    <visual>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <link name="FLP">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/coxa_l.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+      <origin rpy="0 0 3.14" xyz="0 0 -0.25"/>
+    </visual>
+  </link>
+  <link name="FLH">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/femur_l.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="green">
+        <color rgba="0 1 0 1"/>
+      </material>
+      <origin rpy="-1.57 0 0" xyz="-0.8 0.225 0"/>
+    </visual>
+  </link>
+  <link name="FLK">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/tibia_l.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 1"/>
+      </material>
+      <origin rpy="0 1.57 1.57" xyz="0 -0.2 0"/>
+    </visual>
+  </link>
+  <link name="FLT">
+    <contact>
+      <stiffness value="100000"/>
+      <damping value="10"/>
+      <lateral_friction value="1.0"/>
+    </contact>
+    <visual>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <link name="MLP">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/coxa_l.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+      <origin rpy="0 0 3.14" xyz="0 0 -0.25"/>
+    </visual>
+  </link>
+  <link name="MLH">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/femur_l.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="green">
+        <color rgba="0 1 0 1"/>
+      </material>
+      <origin rpy="-1.57 0 0" xyz="-0.8 0.225 0"/>
+    </visual>
+  </link>
+  <link name="MLK">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/tibia_l.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 1"/>
+      </material>
+      <origin rpy="0 1.57 1.57" xyz="0 -0.2 0"/>
+    </visual>
+  </link>
+  <link name="MLT">
+    <contact>
+      <stiffness value="100000"/>
+      <damping value="10"/>
+      <lateral_friction value="1.0"/>
+    </contact>
+    <visual>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <link name="BLP">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/coxa_l.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+      <origin rpy="0 0 3.14" xyz="0 0 -0.25"/>
+    </visual>
+  </link>
+  <link name="BLH">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/femur_l.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="green">
+        <color rgba="0 1 0 1"/>
+      </material>
+      <origin rpy="-1.57 0 0" xyz="-0.8 0.225 0"/>
+    </visual>
+  </link>
+  <link name="BLK">
+    <visual>
+      <geometry>
+        <mesh filename="package://crab_description/meshes/tibia_l.STL" scale="10 10 10"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 1"/>
+      </material>
+      <origin rpy="0 1.57 1.57" xyz="0 -0.2 0"/>
+    </visual>
+  </link>
+  <link name="BLT">
+    <contact>
+      <stiffness value="100000"/>
+      <damping value="10"/>
+      <lateral_friction value="1.0"/>
+    </contact>
+    <visual>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+
+
+
+  <joint name="base_FRP" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="base_link"/>
+    <child link="FRP"/>
+    <origin rpy="0 0 0.7854" xyz="0.515 0.865 0"/>
+  </joint>
+  <joint name="FRP_FRH" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="FRP"/>
+    <child link="FRH"/>
+    <origin xyz="0.3 0.2 -0.25"/>
+  </joint>
+  <joint name="FRH_FRK" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="FRH"/>
+    <child link="FRK"/>
+    <origin xyz="0.807 0 0"/>
+  </joint>
+  <joint name="FRK_FRT" type="fixed">
+    <parent link="FRK"/>
+    <child link="FRT"/>
+    <origin xyz="-0.06 -0.2 -1.125"/>
+  </joint>
+
+  <joint name="base_MRP" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="base_link"/>
+    <child link="MRP"/>
+    <origin xyz="0.7 0 0"/>
+  </joint>
+  <joint name="MRP_MRH" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="MRP"/>
+    <child link="MRH"/>
+    <origin xyz="0.3 0.2 -0.25"/>
+  </joint>
+  <joint name="MRH_MRK" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="MRH"/>
+    <child link="MRK"/>
+    <origin xyz="0.807 0 0"/>
+  </joint>
+  <joint name="MRK_MRT" type="fixed">
+    <parent link="MRK"/>
+    <child link="MRT"/>
+    <origin xyz="-0.06 -0.2 -1.125"/>
+  </joint>
+
+  <joint name="base_BRP" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="base_link"/>
+    <child link="BRP"/>
+    <origin rpy="0 0 -0.7854" xyz="0.515 -0.865 0"/>
+  </joint>
+  <joint name="BRP_BRH" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="BRP"/>
+    <child link="BRH"/>
+    <origin xyz="0.3 0.2 -0.25"/>
+  </joint>
+  <joint name="BRH_BRK" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="BRH"/>
+    <child link="BRK"/>
+    <origin xyz="0.807 0 0"/>
+  </joint>
+  <joint name="BRK_BRT" type="fixed">
+    <parent link="BRK"/>
+    <child link="BRT"/>
+    <origin xyz="-0.06 -0.2 -1.125"/>
+  </joint>
+
+
+  <joint name="base_FLP" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="base_link"/>
+    <child link="FLP"/>
+    <origin rpy="0 0 -0.7854" xyz="-0.515 0.865 0"/>
+  </joint>
+  <joint name="FLP_FLH" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="FLP"/>
+    <child link="FLH"/>
+    <origin xyz="-0.3 0.2 -0.25"/>
+  </joint>
+  <joint name="FLH_FLK" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="FLH"/>
+    <child link="FLK"/>
+    <origin xyz="-0.807 0 0"/>
+  </joint>
+  <joint name="FLK_FLT" type="fixed">
+    <parent link="FLK"/>
+    <child link="FLT"/>
+    <origin xyz="0.06 -0.2 -1.125"/>
+  </joint>
+
+  <joint name="base_MLP" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="base_link"/>
+    <child link="MLP"/>
+    <origin xyz="-0.7 0 0"/>
+  </joint>
+  <joint name="MLP_MLH" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="MLP"/>
+    <child link="MLH"/>
+    <origin xyz="-0.3 0.2 -0.25"/>
+  </joint>
+  <joint name="MLH_MLK" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="MLH"/>
+    <child link="MLK"/>
+    <origin xyz="-0.807 0 0"/>
+  </joint>
+  <joint name="MLK_MLT" type="fixed">
+    <parent link="MLK"/>
+    <child link="MLT"/>
+    <origin xyz="0.06 -0.2 -1.125"/>
+  </joint>
+
+  <joint name="base_BLP" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="base_link"/>
+    <child link="BLP"/>
+    <origin rpy="0 0 0.7854" xyz="-0.515 -0.865 0"/>
+  </joint>
+  <joint name="BLP_BLH" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="BLP"/>
+    <child link="BLH"/>
+    <origin xyz="-0.3 0.2 -0.25"/>
+  </joint>
+  <joint name="BLH_BLK" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-1.18" upper="1.18" velocity="0.3056"/>
+    <parent link="BLH"/>
+    <child link="BLK"/>
+    <origin xyz="-0.807 0 0"/>
+  </joint>
+  <joint name="BLK_BLT" type="fixed">
+    <parent link="BLK"/>
+    <child link="BLT"/>
+    <origin xyz="0.06 -0.2 -1.125"/>
+  </joint>
+
+</robot>

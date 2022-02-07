@@ -8,6 +8,7 @@ import abc
 import serial
 import matplotlib.pyplot as plt
 import itertools
+import pygame
 
 
 # roslaunch urdf_tutorial display.launch model:='D:\Programming\Python\Hexapod-GA-Gait\robot.urdf'
@@ -45,10 +46,12 @@ class LegSequence:
     def createStartingSequence(self):
         # target = self.motions[0][1].evaluate(0.0)
         target = self.getPositionInMotion(1.0, [self.motions[0]])
+        target = [0.0, -0.5, 0.0]
+        print(target)
         motions = []
         if self.legID % 2:
             motions.append((0.0, BezierMotion(np.array([[0.0, target[0], target[0], target[0]], [0.0, 0.0, target[1], target[1]], [0.0, 1.0, 1.0, target[2]]]))))
-            motions.append((0.5, NoMotion(motions[-1][1].evaluate(1.0))))
+            motions.append((0.5, NoMotion([0.0, -0.5, 0.0])))
         else:
             motions.append((0.0, NoMotion()))
             motions.append((0.5, BezierMotion(np.array([[0.0, target[0], target[0], target[0]], [0.0, 0.0, target[1], target[1]], [0.0, 1.0, 1.0, target[2]]]))))
@@ -66,16 +69,16 @@ class LegSequence:
 
     def manualInitMotions(self, legID):
         startPos = [0.0, -0.5, 0.0]
-        knot1 = [0.0, 0.5, 1.0]
-        knot2 = [0.0, 1.0, 0.25]
-        endPos = [0.0, 0.2, 0.0]
+        knot1 = [0.0, 0.0, 0.6]
+        knot2 = [0.0, 0.5, 0.6]
+        endPos = [0.0, 0.5, 0.0]
         motions = []
         if legID % 2:
-            motions.append((0.2, BezierMotion(np.array([[startPos[0], knot1[0], knot2[0], endPos[0]], [startPos[1], knot1[1], knot2[1], endPos[1]], [startPos[2], knot1[2], knot2[2], endPos[2]]]))))
-            motions.append((0.7, LineMotion(endPos, startPos)))
+            motions.append((0.0, BezierMotion(np.array([[startPos[0], knot1[0], knot2[0], endPos[0]], [startPos[1], knot1[1], knot2[1], endPos[1]], [startPos[2], knot1[2], knot2[2], endPos[2]]]))))
+            motions.append((0.5, LineMotion(endPos, startPos)))
         else:
-            motions.append((0.2, LineMotion(endPos, startPos)))
-            motions.append((0.7, BezierMotion(np.array([[startPos[0], knot1[0], knot2[0], endPos[0]], [startPos[1], knot1[1], knot2[1], endPos[1]], [startPos[2], knot1[2], knot2[2], endPos[2]]]))))
+            motions.append((0.0, LineMotion(endPos, startPos)))
+            motions.append((0.5, BezierMotion(np.array([[startPos[0], knot1[0], knot2[0], endPos[0]], [startPos[1], knot1[1], knot2[1], endPos[1]], [startPos[2], knot1[2], knot2[2], endPos[2]]]))))
         return motions
 
     def addNoMotionConsts(self):
@@ -103,13 +106,14 @@ class LegSequence:
 
     def evaluate(self, progress):
         if self.inStartSequence:
-            print(self.inStartSequence, progress)
+            print(self.inStartSequence, progress, self.lastProgress)
             if self.lastProgress > progress:
                 self.inStartSequence = False
+                self.lastProgress = progress
                 return self.getPositionInMotion(1.0, self.startingSequence)
             self.lastProgress = progress
             return self.getPositionInMotion(progress, self.startingSequence)
-        return self.getPositionInMotion(progress, self.motions)
+        return self.getPositionInMotion(progress - self.lastProgress, self.motions)
 
 
 class Motion(metaclass=abc.ABCMeta):
@@ -123,6 +127,7 @@ class BezierMotion(Motion):
         self.knots = knots
         self.curve = bezier.Curve(self.knots, degree=3)
         self.velocity_curve = bezier.Curve(np.array([[0.0, 0.5, 0.5, 1.0], [0.0, 0.5, 0.5, 1.0]]), degree=3)
+        # plotCurve(self.velocity_curve)
 
     def evaluate(self, progress):
         # velocity curve: y=a+\frac{b}{\left(sx+1\right)^{7}}
@@ -138,6 +143,7 @@ class LineMotion(Motion):
         self.startPoint = startPoint
         self.endPoint = endPoint
         self.velocity_curve = bezier.Curve(np.array([[0.0, 1.0, 1.0, 1.0], [0.0, 0.0, 0.0, 1.0]]), degree=3)
+        # plotCurve(self.velocity_curve)
 
     # Parametric equation of a straight line given a progression percentage
     def evaluate(self, progress):
@@ -272,7 +278,7 @@ physicsClient = p.connect(p.GUI)
 p.setAdditionalSearchPath(pybullet_data.getDataPath())
 p.setGravity(0, 0, -9.8)
 planeId = p.loadURDF("plane.urdf")
-hexapod_ID = p.loadURDF("robot.urdf", [0, 0, 1.4], [0, 0, 0, 1])
+hexapod_ID = p.loadURDF("robot2.urdf", [0, 0, 1.5], [0, 0, 0, 1])
 # hexapod_ID = p.loadURDF("crab_description/models/crab_model.urdf", [0, 0, 1.4], [0, 0, 0, 1])
 
 control_IDs = []
@@ -284,7 +290,7 @@ ll = ([-servoRangeOfMotion] * 3) + ([0] * 15)  # lowerLimit
 ul = ([servoRangeOfMotion] * 3) + ([0] * 15)  # upperLimit
 jr = ([servoRangeOfMotion] * 3) + ([0] * 15)  # jointRange
 rp = ([0] * 18)  # restPos
-jd = ([3] * 18)  # jointDamping
+jd = ([0] * 18)  # jointDamping
 
 baseToEndEffectorConstVec = []
 for i in range(3, 24, 4):
@@ -306,24 +312,39 @@ lastTime = programStartTime
 counter = 0
 
 # Gait test
-gaitDuration = 3
+gaitDuration = 2
 testGait = Gait(gaitDuration)
+setServoStatesLegs(testGait.evaluate(counter))
 
 # PySerial init
-# ssc32 = serial.Serial('COM5', 115200, timeout=5)  # open serial port
+#ssc32 = serial.Serial('COM5', 115200, timeout=5)  # open serial port
+
+# Init game controller input
+pygame.init()
+pygame.joystick.init()
+joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+joystick = joysticks[0]
 
 plt.show()
 while True:
+    # Game controller input
+    pygame.event.pump()
+    left_stick = np.array([joystick.get_axis(0), joystick.get_axis(1)])
+    left_stick_magnitude = np.linalg.norm(left_stick)
+    if left_stick_magnitude > 0.5:
+        print(left_stick)
+
     # Update timing variables
     now = time.time()
     runTime = now - programStartTime
     dt = now - lastTime
-    counter += dt
+    if abs(left_stick[1]) > 0.5:
+        counter += dt * -left_stick[1]
+        setServoStatesLegs(testGait.evaluate(counter))
+        #updateRealServos(ssc32, 150)
     lastTime = now
 
     # setServoStatesManual()
-    setServoStatesLegs(testGait.evaluate(counter))
-    # updateRealServos(ssc32, 150)
 
     for i in range(6):
         currentPos[i] = p.getLinkState(hexapod_ID, (4 * i) + 3)[0]
