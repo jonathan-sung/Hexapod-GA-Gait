@@ -1,6 +1,11 @@
-import numpy as np
-
-v = (5 % 12) / 12
-print(v)
-b = np.clip(10, 0, 3)
-print(b)
+l1 = list(range(0, 10))
+l2 = list(range(90, 94))
+l1.extend(l2)
+print(l1)
+print(l2)
+l2[1] = 55
+print(l1)
+print(l2)
+l1.extend(l2)
+print(l1)
+print(l1[3:6])

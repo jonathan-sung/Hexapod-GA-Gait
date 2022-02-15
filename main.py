@@ -17,11 +17,16 @@ import pygame
 
 class Gait:
 
-    def __init__(self, duration):
-        self.duration = duration
+    def __init__(self, chromosome):
+        self.duration = chromosome[0]
+        self.motorForce = chromosome[1]
+        self.jointDamping = chromosome[2]
+        self.motion_chromosome = chromosome[3:]
         self.legSequences = []
         for j in range(6):
-            ls = LegSequence(duration, j)
+            motions = self.motion_chromosome[j * SIZE_OF_MOTION_CHROMOSOME * MAX_MOTIONS_IN_SEQUENCE: (j + 1) * SIZE_OF_MOTION_CHROMOSOME * MAX_MOTIONS_IN_SEQUENCE]
+            print(motions)
+            ls = LegSequence(chromosome[0], j, motions)
             self.legSequences.append(ls)
 
     def evaluate(self, elapsed_time):
@@ -33,38 +38,36 @@ class Gait:
 
 
 class LegSequence:
-    def __init__(self, duration, legID):
+    def __init__(self, duration, legID, motion_chromosome):
         self.duration = duration
         self.legID = legID
-        self.motions = self.manualInitMotions(legID)
+        # self.motions = self.manualInitMotions(legID)
+        self.motions = self.readChromosome(motion_chromosome)
         self.motions.sort(key=lambda x: x[0])
         self.addNoMotionConsts()
-        self.startingSequence = self.createStartingSequence()
-        self.inStartSequence = False
-        self.lastProgress = 0
 
-    def createStartingSequence(self):
-        # target = self.motions[0][1].evaluate(0.0)
-        target = self.getPositionInMotion(1.0, [self.motions[0]])
-        target = [0.0, -0.5, 0.0]
-        print(target)
+    def readChromosome(self, chromosome):
         motions = []
-        if self.legID % 2:
-            motions.append((0.0, BezierMotion(np.array([[0.0, target[0], target[0], target[0]], [0.0, 0.0, target[1], target[1]], [0.0, 1.0, 1.0, target[2]]]))))
-            motions.append((0.5, NoMotion([0.0, -0.5, 0.0])))
-        else:
-            motions.append((0.0, NoMotion()))
-            motions.append((0.5, BezierMotion(np.array([[0.0, target[0], target[0], target[0]], [0.0, 0.0, target[1], target[1]], [0.0, 1.0, 1.0, target[2]]]))))
-        return motions
-
-    def testInitMotions(self):
-        startPos = [0.0, -0.5, 0.0]
-        knot1 = [0.0, 0.5, 1.0]
-        knot2 = [0.0, 1.0, 0.25]
-        endPos = [0.0, 0.2, 0.0]
-        # plotCurve(BezierMotion(np.array([[startPos[1], knot1[1], knot2[1], endPos[1]], [startPos[2], knot1[2], knot2[2], endPos[2]]])).curve)
-        motions = [(0.8, NoMotion()), (0.7, LineMotion(endPos, startPos)),
-                   (0.7, BezierMotion(np.array([[startPos[0], knot1[0], knot2[0], endPos[0]], [startPos[1], knot1[1], knot2[1], endPos[1]], [startPos[2], knot1[2], knot2[2], endPos[2]]])))]
+        for i in range(MAX_MOTIONS_IN_SEQUENCE):
+            local_index = i * SIZE_OF_MOTION_CHROMOSOME
+            motion_type = chromosome[0 + local_index]
+            start_time = chromosome[1 + local_index]
+            print(local_index)
+            if motion_type == 0:
+                continue
+            elif motion_type == 1:  # line motions
+                motions.append((start_time, LineMotion([chromosome[6 + local_index], chromosome[7 + local_index], chromosome[8 + local_index]],
+                                                       [chromosome[15 + local_index], chromosome[16 + local_index], chromosome[17 + local_index]],
+                                                       np.array([[0.0, chromosome[2 + local_index], chromosome[4 + local_index], 1.0],
+                                                                 [0.0, chromosome[3 + local_index], chromosome[5 + local_index], 1.0]]))))
+            elif motion_type == 2:  # curve motions
+                motions.append((start_time,
+                                BezierMotion(np.array([[chromosome[6 + local_index], chromosome[9 + local_index], chromosome[12 + local_index], chromosome[15 + local_index]],
+                                                       [chromosome[7 + local_index], chromosome[10 + local_index], chromosome[13 + local_index], chromosome[16 + local_index]],
+                                                       [chromosome[8 + local_index], chromosome[11 + local_index], chromosome[14 + local_index], chromosome[17 + local_index]]]),
+                                             np.array([[0.0, chromosome[2 + local_index], chromosome[4 + local_index], 1.0], [0.0, chromosome[3 + local_index], chromosome[5 + local_index], 1.0]]))))
+            elif motion_type == 4:
+                motions.append((start_time, NoMotion()))
         return motions
 
     def manualInitMotions(self, legID):
@@ -105,15 +108,7 @@ class LegSequence:
         return [0.0, 0.0, 0.0]
 
     def evaluate(self, progress):
-        if self.inStartSequence:
-            print(self.inStartSequence, progress, self.lastProgress)
-            if self.lastProgress > progress:
-                self.inStartSequence = False
-                self.lastProgress = progress
-                return self.getPositionInMotion(1.0, self.startingSequence)
-            self.lastProgress = progress
-            return self.getPositionInMotion(progress, self.startingSequence)
-        return self.getPositionInMotion(progress - self.lastProgress, self.motions)
+        return self.getPositionInMotion(progress, self.motions)
 
 
 class Motion(metaclass=abc.ABCMeta):
@@ -123,10 +118,10 @@ class Motion(metaclass=abc.ABCMeta):
 
 
 class BezierMotion(Motion):
-    def __init__(self, knots):
+    def __init__(self, knots, velocity_knots):
         self.knots = knots
         self.curve = bezier.Curve(self.knots, degree=3)
-        self.velocity_curve = bezier.Curve(np.array([[0.0, 0.5, 0.5, 1.0], [0.0, 0.5, 0.5, 1.0]]), degree=3)
+        self.velocity_curve = bezier.Curve(velocity_knots, degree=3)
         # plotCurve(self.velocity_curve)
 
     def evaluate(self, progress):
@@ -139,10 +134,10 @@ class BezierMotion(Motion):
 
 
 class LineMotion(Motion):
-    def __init__(self, startPoint, endPoint):
+    def __init__(self, startPoint, endPoint, velocity_knots):
         self.startPoint = startPoint
         self.endPoint = endPoint
-        self.velocity_curve = bezier.Curve(np.array([[0.0, 1.0, 1.0, 1.0], [0.0, 0.0, 0.0, 1.0]]), degree=3)
+        self.velocity_curve = bezier.Curve(velocity_knots, degree=3)
         # plotCurve(self.velocity_curve)
 
     # Parametric equation of a straight line given a progression percentage
@@ -273,7 +268,33 @@ def flatten(t):
     return [item for sublist in t for item in sublist]
 
 
+def manualChromosomeCreation():
+    duration = 2
+    force = 150
+    jointDamping = 1
+    chromosome = [duration, force, jointDamping]
+    bezierMotion = [2, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -0.5, 0.0, 0.0, 0.0, 0.6, 0.0, 0.5, 0.6, 0.0, 0.5, 0.0]
+    lineMotion = [1, 0.5, 1.0, 0.0, 1.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5, 0.0]
+    for leg_id in range(NUM_OF_LEGS):
+        if leg_id % 2 == 0:
+            bezierMotion[1] = 0.0
+            lineMotion[1] = 0.5
+        else:
+            bezierMotion[1] = 0.5
+            lineMotion[1] = 0.0
+        chromosome.extend(bezierMotion)
+        chromosome.extend(lineMotion)
+        for motion_id in range(MAX_MOTIONS_IN_SEQUENCE - 2):
+            chromosome.extend([0] * SIZE_OF_MOTION_CHROMOSOME)
+    print(len(chromosome))
+    return chromosome
+
+
 # start of main program
+MAX_MOTIONS_IN_SEQUENCE = 4
+NUM_OF_LEGS = 6
+SIZE_OF_MOTION_CHROMOSOME = 18
+
 physicsClient = p.connect(p.GUI)
 p.setAdditionalSearchPath(pybullet_data.getDataPath())
 p.setGravity(0, 0, -9.8)
@@ -289,7 +310,6 @@ init_debug_parameters()
 ll = ([-servoRangeOfMotion] * 3) + ([0] * 15)  # lowerLimit
 ul = ([servoRangeOfMotion] * 3) + ([0] * 15)  # upperLimit
 jr = ([servoRangeOfMotion] * 3) + ([0] * 15)  # jointRange
-rp = ([0] * 18)  # restPos
 jd = ([0] * 18)  # jointDamping
 
 baseToEndEffectorConstVec = []
@@ -313,11 +333,11 @@ counter = 0
 
 # Gait test
 gaitDuration = 2
-testGait = Gait(gaitDuration)
+testGait = Gait(manualChromosomeCreation())
 setServoStatesLegs(testGait.evaluate(counter))
 
 # PySerial init
-#ssc32 = serial.Serial('COM5', 115200, timeout=5)  # open serial port
+# ssc32 = serial.Serial('COM5', 115200, timeout=5)  # open serial port
 
 # Init game controller input
 pygame.init()
@@ -341,7 +361,7 @@ while True:
     if abs(left_stick[1]) > 0.5:
         counter += dt * -left_stick[1]
         setServoStatesLegs(testGait.evaluate(counter))
-        #updateRealServos(ssc32, 150)
+        # updateRealServos(ssc32, 150)
     lastTime = now
 
     # setServoStatesManual()
