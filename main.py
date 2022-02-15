@@ -9,6 +9,7 @@ import serial
 import matplotlib.pyplot as plt
 import itertools
 import pygame
+import numpy.linalg as la
 
 
 # roslaunch urdf_tutorial display.launch model:='D:\Programming\Python\Hexapod-GA-Gait\robot.urdf'
@@ -25,7 +26,6 @@ class Gait:
         self.legSequences = []
         for j in range(6):
             motions = self.motion_chromosome[j * SIZE_OF_MOTION_CHROMOSOME * MAX_MOTIONS_IN_SEQUENCE: (j + 1) * SIZE_OF_MOTION_CHROMOSOME * MAX_MOTIONS_IN_SEQUENCE]
-            print(motions)
             ls = LegSequence(chromosome[0], j, motions)
             self.legSequences.append(ls)
 
@@ -33,7 +33,6 @@ class Gait:
         leg_positions = []
         for ls in self.legSequences:
             leg_positions.append(ls.evaluate((elapsed_time % self.duration) / self.duration))
-        # print(leg_positions)
         return leg_positions
 
 
@@ -52,7 +51,6 @@ class LegSequence:
             local_index = i * SIZE_OF_MOTION_CHROMOSOME
             motion_type = chromosome[0 + local_index]
             start_time = chromosome[1 + local_index]
-            print(local_index)
             if motion_type == 0:
                 continue
             elif motion_type == 1:  # line motions
@@ -194,26 +192,7 @@ def updateRealServos(ser, t):
             'utf-8'))
 
 
-def init_debug_parameters():
-    for j in list(range(0, 6)):
-        control_IDs.append(p.addUserDebugParameter(f"Pelvis {j}", -servoRangeOfMotion / 2, servoRangeOfMotion / 2, 0))
-        control_IDs.append(p.addUserDebugParameter(f"Hip {j}", -servoRangeOfMotion / 2, servoRangeOfMotion / 2, 0))
-        control_IDs.append(p.addUserDebugParameter(f"Knee {j}", -servoRangeOfMotion / 2, servoRangeOfMotion / 2, 0))
-
-
-def read_debug_parameters():
-    angles = []
-    for x in control_IDs:
-        angles.append(p.readUserDebugParameter(x))
-    return angles
-
-
 def calculateIK3(feet_positions):
-    debug_parameters = np.array([
-        p.readUserDebugParameter(xPara),
-        p.readUserDebugParameter(yPara),
-        p.readUserDebugParameter(zPara)])
-
     pos_body = np.array(p.getBasePositionAndOrientation(hexapod_ID)[0])
     orn_body = p.getBasePositionAndOrientation(hexapod_ID)[1]
 
@@ -246,8 +225,8 @@ def setServoStatesManual():
     p.setJointMotorControlArray(
         hexapod_ID,
         ([x for x in list(range(0, 24)) if x not in list(range(3, 24, 4))]),
-        p.POSITION_CONTROL,
-        targetPositions=read_debug_parameters())
+        p.POSITION_CONTROL)
+    # targetPositions=read_debug_parameters())
 
 
 def setServoStatesLegs(feet_positions):
@@ -286,8 +265,38 @@ def manualChromosomeCreation():
         chromosome.extend(lineMotion)
         for motion_id in range(MAX_MOTIONS_IN_SEQUENCE - 2):
             chromosome.extend([0] * SIZE_OF_MOTION_CHROMOSOME)
-    print(len(chromosome))
     return chromosome
+
+
+def gaitScore(bodyID):
+    current_position = p.getBasePositionAndOrientation(bodyID)[0]
+    distance = distanceFromOrigin(bodyID)
+    angle = angleBetweenVectors(np.array([0, 1]), np.array([current_position[0], current_position[1]]))
+    return distance, abs(angle)
+
+
+def distanceFromOrigin(bodyID):
+    return p.getBasePositionAndOrientation(bodyID)[0][1]
+
+
+def angleBetweenVectors(a, b):
+    unit_vector_1 = a / np.linalg.norm(a)
+    unit_vector_2 = b / np.linalg.norm(b)
+    dot_product = np.dot(unit_vector_1, unit_vector_2)
+    angle = np.arccos(dot_product)
+    return angle
+
+
+def evaluateGait(individual):
+    dt = 0
+    gait = Gait(individual)
+    p.resetBasePositionAndOrientation(hexapod_ID, [0, 0, 1.5], [0, 0, 0, 1])
+    for ii in range(5000):
+        dt += 1. / 240.
+        setServoStatesLegs(gait.evaluate(dt))
+        p.stepSimulation()
+    print(f'Time Elapsed: {time.time() - lastTime}')
+    print(f'Evaluation: {gaitScore(hexapod_ID)}')
 
 
 # start of main program
@@ -300,11 +309,8 @@ p.setAdditionalSearchPath(pybullet_data.getDataPath())
 p.setGravity(0, 0, -9.8)
 planeId = p.loadURDF("plane.urdf")
 hexapod_ID = p.loadURDF("robot2.urdf", [0, 0, 1.5], [0, 0, 0, 1])
-# hexapod_ID = p.loadURDF("crab_description/models/crab_model.urdf", [0, 0, 1.4], [0, 0, 0, 1])
 
-control_IDs = []
 servoRangeOfMotion = math.pi * 3 / 4
-init_debug_parameters()
 
 # setup IK parameters
 ll = ([-servoRangeOfMotion] * 3) + ([0] * 15)  # lowerLimit
@@ -317,11 +323,6 @@ for i in range(3, 24, 4):
     baseToEndEffectorConstVec.append(
         np.array(p.getLinkState(hexapod_ID, i)[4]) - np.array(p.getBasePositionAndOrientation(hexapod_ID)[0]))
 
-xPara = p.addUserDebugParameter("X", -2, 2, 0)
-yPara = p.addUserDebugParameter("Y", -3, 3, 0)
-zPara = p.addUserDebugParameter("Z", -3, 3, 0)
-rotationPara = p.addUserDebugParameter("Rotation", -math.pi, math.pi, 0)
-
 prevPos = []
 currentPos = [0, 0, 0, 0, 0, 0]
 for i in range(6):
@@ -331,46 +332,12 @@ programStartTime = time.time()
 lastTime = programStartTime
 counter = 0
 
-# Gait test
-gaitDuration = 2
-testGait = Gait(manualChromosomeCreation())
-setServoStatesLegs(testGait.evaluate(counter))
-
 # PySerial init
 # ssc32 = serial.Serial('COM5', 115200, timeout=5)  # open serial port
 
-# Init game controller input
-pygame.init()
-pygame.joystick.init()
-joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
-joystick = joysticks[0]
+# plt.show()
+for j in range(100):
+    evaluateGait(manualChromosomeCreation())
 
-plt.show()
-while True:
-    # Game controller input
-    pygame.event.pump()
-    left_stick = np.array([joystick.get_axis(0), joystick.get_axis(1)])
-    left_stick_magnitude = np.linalg.norm(left_stick)
-    if left_stick_magnitude > 0.5:
-        print(left_stick)
-
-    # Update timing variables
-    now = time.time()
-    runTime = now - programStartTime
-    dt = now - lastTime
-    if abs(left_stick[1]) > 0.5:
-        counter += dt * -left_stick[1]
-        setServoStatesLegs(testGait.evaluate(counter))
-        # updateRealServos(ssc32, 150)
-    lastTime = now
-
-    # setServoStatesManual()
-
-    for i in range(6):
-        currentPos[i] = p.getLinkState(hexapod_ID, (4 * i) + 3)[0]
-        p.addUserDebugLine(prevPos[i], currentPos[i], [0, 0, 0.3], 4, gaitDuration)
-        prevPos[i] = currentPos[i]
-    p.setRealTimeSimulation(1)
-
-ssc32.close()  # close port
+# ssc32.close()  # close port
 p.disconnect(physicsClient)
