@@ -53,10 +53,10 @@ toolbox.register("evaluate", oneMaxFitness)
 # genetic operators:mutFlipBit
 
 # Tournament selection with tournament size of 3:
-toolbox.register("select", tools.selStochasticUniversalSampling)
+toolbox.register("select", tools.selTournament, tournsize=2)
 
 # Single-point crossover:
-toolbox.register("mate", tools.cx)
+toolbox.register("mate", tools.cxTwoPoint)
 
 # Flip-bit mutation:
 # indpb: Independent probability for each attribute to be flipped
