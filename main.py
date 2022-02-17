@@ -340,8 +340,6 @@ def evaluateGait2(individual):
             dt += 1. / 240.
             setServoStatesLegs(gait.evaluate(dt), individual[1], 0)
             p.stepSimulation()
-            print(f'Distance3: {p.getBasePositionAndOrientation(hexapod_ID)[0][1]}')
-            # time.sleep(0.0000001)
         gaitEvaluation = gaitScore(hexapod_ID)
         print(f'Time Elapsed: {time.time() - lastTime} seconds')
         print(f'Evaluation: {gaitEvaluation}')
@@ -364,7 +362,7 @@ def resetLegJoints():
 
 def resetEnvironment():
     resetLegJoints()
-    p.resetBasePositionAndOrientation(hexapod_ID, [0, 0, 1.375], [0, 0, 0, 1])
+    p.resetBasePositionAndOrientation(hexapod_ID, [0, 0, 1.375 + random.uniform(0, 0.002)], [0, 0, 0, 1])
     # p.resetBasePositionAndOrientation(plane_ID, [0, 0, 0], [0, 0, 0, 1])
     p.stepSimulation()
 
@@ -386,8 +384,8 @@ SIZE_OF_MOTION_CHROMOSOME = 18
 # PyBullet Init
 physicsClient = p.connect(p.GUI)
 p.setAdditionalSearchPath(pybullet_data.getDataPath())
-plane_ID = p.loadURDF("plane.urdf")
-hexapod_ID = p.loadURDF("robot2.urdf", [0, 0, 1.375], [0, 0, 0, 1])
+plane_ID = None
+hexapod_ID = None
 resetPyBulletSimulation()
 # p.setGravity(0, 0, -9.8)
 # plane_ID = p.loadURDF("plane.urdf")
