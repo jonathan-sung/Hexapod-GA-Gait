@@ -3,21 +3,24 @@ from deap import creator
 from deap import tools
 import random
 import seaborn as sns
+import numpy as np
 import matplotlib.pyplot as plt
+import hexapodengine as h
+import elitism
 
-DIMENSIONS = 3 + (SIZE_OF_MOTION_CHROMOSOME * MAX_MOTIONS_IN_SEQUENCE * NUM_OF_LEGS)  # number of dimensions
+DIMENSIONS = 3 + (h.SIZE_OF_MOTION_CHROMOSOME * h.MAX_MOTIONS_IN_SEQUENCE * h.NUM_OF_LEGS)
 BOUNDS_LOW = [0.1, 50, 0] + ((([0] * 6) + ([-2] * 12)) * 4 * 6)
 BOUNDS_HIGH = [12, 300, 1] + (([4] + [1] + ([1] * 4) + ([2] * 12)) * 4 * 6)
 
 POPULATION_SIZE = 100
 P_CROSSOVER = 0.9  # probability for crossover
-P_MUTATION = 0.5  # (try also 0.5) probability for mutating an individual
-MAX_GENERATIONS = 100
-HALL_OF_FAME_SIZE = int((1. / 10.) * POPULATION_SIZE)
+P_MUTATION = 0.65  # (try also 0.5) probability for mutating an individual
+MAX_GENERATIONS = 150
+HALL_OF_FAME_SIZE = 10
 CROWDING_FACTOR = 15.0  # crowding factor for crossover and mutation
 
 toolbox = base.Toolbox()
-creator.create("FitnessMax", base.Fitness, weights=(1.0, -0.5))
+creator.create("FitnessMax", base.Fitness, weights=(1.0, -1.0))
 creator.create("Individual", list, fitness=creator.FitnessMax)
 
 for i in range(DIMENSIONS):
@@ -30,10 +33,10 @@ for i in range(DIMENSIONS):
 
 toolbox.register("individualCreator", tools.initCycle, creator.Individual, layer_size_attributes, n=1)
 toolbox.register("populationCreator", tools.initRepeat, list, toolbox.individualCreator)
-toolbox.register("evaluate", evaluateGait)
-toolbox.register("select", tools.selTournament, tournsize=2)
+toolbox.register("evaluate", h.evaluateGait)
+toolbox.register("select", tools.selStochasticUniversalSampling)
 toolbox.register("mate", tools.cxSimulatedBinaryBounded, low=BOUNDS_LOW, up=BOUNDS_HIGH, eta=CROWDING_FACTOR)
-toolbox.register("mutate", tools.mutPolynomialBounded, low=BOUNDS_LOW, up=BOUNDS_HIGH, eta=CROWDING_FACTOR, indpb=2.0 / 100.0)
+toolbox.register("mutate", tools.mutPolynomialBounded, low=BOUNDS_LOW, up=BOUNDS_HIGH, eta=CROWDING_FACTOR, indpb=5.0 / 100.0)
 
 
 # Genetic Algorithm flow:

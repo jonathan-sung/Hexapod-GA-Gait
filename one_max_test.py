@@ -8,16 +8,17 @@ import numpy
 
 import matplotlib.pyplot as plt
 import seaborn as sns
+import elitism
 
 # problem constants:
-ONE_MAX_LENGTH = 100  # length of bit string to be optimized
+ONE_MAX_LENGTH = 1000  # length of bit string to be optimized
 
 # Genetic Algorithm constants:
-POPULATION_SIZE = 200
+POPULATION_SIZE = 100
 P_CROSSOVER = 0.9  # probability for crossover
-P_MUTATION = 0.1   # probability for mutating an individual
+P_MUTATION = 0.5   # probability for mutating an individual
 MAX_GENERATIONS = 100
-HALL_OF_FAME_SIZE = 10
+HALL_OF_FAME_SIZE = 5
 
 
 # set the random seed:
@@ -53,14 +54,15 @@ toolbox.register("evaluate", oneMaxFitness)
 # genetic operators:mutFlipBit
 
 # Tournament selection with tournament size of 3:
-toolbox.register("select", tools.selTournament, tournsize=2)
+# toolbox.register("select", tools.selTournament, tournsize=20)
+toolbox.register("select", tools.selStochasticUniversalSampling)
 
 # Single-point crossover:
 toolbox.register("mate", tools.cxTwoPoint)
 
 # Flip-bit mutation:
 # indpb: Independent probability for each attribute to be flipped
-toolbox.register("mutate", tools.mutFlipBit, indpb=1.0/ONE_MAX_LENGTH)
+toolbox.register("mutate", tools.mutFlipBit, indpb=5.0/ONE_MAX_LENGTH)
 
 
 # Genetic Algorithm flow:
@@ -78,7 +80,7 @@ def main():
     hof = tools.HallOfFame(HALL_OF_FAME_SIZE)
 
     # perform the Genetic Algorithm flow with hof feature added:
-    population, logbook = algorithms.eaSimple(population, toolbox, cxpb=P_CROSSOVER, mutpb=P_MUTATION,
+    population, logbook = elitism.eaSimpleWithElitism(population, toolbox, cxpb=P_CROSSOVER, mutpb=P_MUTATION,
                                               ngen=MAX_GENERATIONS, stats=stats, halloffame=hof, verbose=True)
 
     # print Hall of Fame info:
