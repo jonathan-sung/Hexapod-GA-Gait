@@ -5,7 +5,7 @@ from deap import tools
 import random
 import numpy
 
-# import mlp_layers_test
+import mlp_layers_test
 import elitism
 
 # boundaries for layer size parameters:
@@ -28,7 +28,7 @@ RANDOM_SEED = 42
 random.seed(RANDOM_SEED)
 
 # create the classifier accuracy test class:
-# test = mlp_layers_test.MlpLayersTest(RANDOM_SEED)
+test = mlp_layers_test.MlpLayersTest(RANDOM_SEED)
 
 toolbox = base.Toolbox()
 
@@ -68,7 +68,7 @@ toolbox.register("populationCreator",
 
 # fitness calculation
 def classificationAccuracy(individual):
-    return 1,
+    return test.getAccuracy(individual),
 
 
 toolbox.register("evaluate", classificationAccuracy)
