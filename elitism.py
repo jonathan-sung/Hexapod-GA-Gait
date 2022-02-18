@@ -1,13 +1,16 @@
 from deap import tools
 from deap import algorithms
+import time
+
 
 def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
-             halloffame=None, verbose=__debug__):
+                        halloffame=None, verbose=__debug__):
     """This algorithm is similar to DEAP eaSimple() algorithm, with the modification that
     halloffame is used to implement an elitism mechanism. The individuals contained in the
     halloffame are directly injected into the next generation and are not subject to the
     genetic operators of selection, crossover and mutation.
     """
+    lastTime = time.time()
     logbook = tools.Logbook()
     logbook.header = ['gen', 'nevals'] + (stats.fields if stats else [])
 
@@ -26,11 +29,12 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
     record = stats.compile(population) if stats else {}
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
     if verbose:
+        print(f'Gen 0 | Time Elapsed: {time.time() - lastTime}')
         print(logbook.stream)
 
     # Begin the generational process
     for gen in range(1, ngen + 1):
-
+        lastTime = time.time()
         # Select the next generation individuals
         offspring = toolbox.select(population, len(population) - hof_size)
 
@@ -56,6 +60,7 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
         record = stats.compile(population) if stats else {}
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
         if verbose:
+            print(f'Gen {gen} | Time Elapsed: {time.time() - lastTime}')
             print(logbook.stream)
 
     return population, logbook

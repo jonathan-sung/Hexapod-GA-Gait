@@ -1,3 +1,5 @@
+import time
+
 from deap import base
 from deap import creator
 from deap import tools
@@ -9,17 +11,17 @@ import numpy
 import matplotlib.pyplot as plt
 import seaborn as sns
 import elitism
+import multiprocessing
 
 # problem constants:
 ONE_MAX_LENGTH = 1000  # length of bit string to be optimized
 
 # Genetic Algorithm constants:
-POPULATION_SIZE = 100
+POPULATION_SIZE = 500
 P_CROSSOVER = 0.9  # probability for crossover
-P_MUTATION = 0.5   # probability for mutating an individual
+P_MUTATION = 0.5  # probability for mutating an individual
 MAX_GENERATIONS = 100
 HALL_OF_FAME_SIZE = 5
-
 
 # set the random seed:
 RANDOM_SEED = 42
@@ -62,12 +64,12 @@ toolbox.register("mate", tools.cxTwoPoint)
 
 # Flip-bit mutation:
 # indpb: Independent probability for each attribute to be flipped
-toolbox.register("mutate", tools.mutFlipBit, indpb=5.0/ONE_MAX_LENGTH)
+toolbox.register("mutate", tools.mutFlipBit, indpb=3.0 / ONE_MAX_LENGTH)
 
+lastTime = time.time()
 
 # Genetic Algorithm flow:
 def main():
-
     # create initial population (generation 0):
     population = toolbox.populationCreator(n=POPULATION_SIZE)
 
@@ -81,7 +83,7 @@ def main():
 
     # perform the Genetic Algorithm flow with hof feature added:
     population, logbook = elitism.eaSimpleWithElitism(population, toolbox, cxpb=P_CROSSOVER, mutpb=P_MUTATION,
-                                              ngen=MAX_GENERATIONS, stats=stats, halloffame=hof, verbose=True)
+                                                      ngen=MAX_GENERATIONS, stats=stats, halloffame=hof, verbose=True)
 
     # print Hall of Fame info:
     print("Hall of Fame Individuals = ", *hof.items, sep="\n")
@@ -98,8 +100,13 @@ def main():
     plt.ylabel('Max / Average Fitness')
     plt.title('Max and Average Fitness over Generations')
 
+    print("Time Elapsed: ", (time.time() - lastTime))
     plt.show()
 
-print("name", __name__)
+
 if __name__ == "__main__":
+    pool = multiprocessing.Pool(processes=8)
+    toolbox.register("map", pool.map)
     main()
+    pool.close()
+
