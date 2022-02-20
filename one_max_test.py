@@ -56,7 +56,8 @@ toolbox.register("evaluate", oneMaxFitness)
 # genetic operators:mutFlipBit
 
 # Tournament selection with tournament size of 3:
-# toolbox.register("select", tools.selTournament, tournsize=20)
+# toolbox.register("select", tools.selTournament, tournsize=int(0.1 * 500))
+# toolbox.register("select", tools.selStochasticUniversalSampling)
 toolbox.register("select", tools.selStochasticUniversalSampling)
 
 # Single-point crossover:
@@ -68,8 +69,12 @@ toolbox.register("mutate", tools.mutFlipBit, indpb=3.0 / ONE_MAX_LENGTH)
 
 lastTime = time.time()
 
+
 # Genetic Algorithm flow:
 def main():
+    pool = multiprocessing.Pool()
+    toolbox.register("map", pool.map)
+
     # create initial population (generation 0):
     population = toolbox.populationCreator(n=POPULATION_SIZE)
 
@@ -92,6 +97,7 @@ def main():
     # extract statistics:
     maxFitnessValues, meanFitnessValues = logbook.select("max", "avg")
 
+    pool.close()
     # plot statistics:
     sns.set_style("whitegrid")
     plt.plot(maxFitnessValues, color='red')
@@ -105,8 +111,4 @@ def main():
 
 
 if __name__ == "__main__":
-    pool = multiprocessing.Pool(processes=8)
-    toolbox.register("map", pool.map)
     main()
-    pool.close()
-

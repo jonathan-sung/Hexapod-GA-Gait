@@ -14,15 +14,15 @@ BOUNDS_LOW = [0.1, 50, 0] + ((([0] * 6) + ([-2] * 12)) * 4 * 6)
 BOUNDS_HIGH = [12, 300, 1] + (([4] + [1] + ([1] * 4) + ([2] * 12)) * 4 * 6)
 
 POPULATION_SIZE = 100
-P_CROSSOVER = 0.9  # probability for crossover
+P_CROSSOVER = 1  # probability for crossover
 P_MUTATION = 0.5  # (try also 0.5) probability for mutating an individual
-MAX_GENERATIONS = 10
-HALL_OF_FAME_SIZE = int(0.1 * POPULATION_SIZE)
+MAX_GENERATIONS = 200
+HALL_OF_FAME_SIZE = int(0.02 * POPULATION_SIZE)
 CROWDING_FACTOR = 15.0  # crowding factor for crossover and mutation
 
 toolbox = base.Toolbox()
-creator.create("FitnessMax", base.Fitness, weights=(1.0, -1.0))
-creator.create("Individual", list, fitness=creator.FitnessMax)
+creator.create("FitnessCompound", base.Fitness, weights=(1.0, -1.0))
+creator.create("Individual", list, fitness=creator.FitnessCompound)
 
 for i in range(DIMENSIONS):
     toolbox.register("layer_size_attribute_" + str(i), random.uniform, BOUNDS_LOW[i], BOUNDS_HIGH[i])
@@ -35,7 +35,8 @@ for i in range(DIMENSIONS):
 toolbox.register("individualCreator", tools.initCycle, creator.Individual, layer_size_attributes, n=1)
 toolbox.register("populationCreator", tools.initRepeat, list, toolbox.individualCreator)
 toolbox.register("evaluate", h.evaluateGait)
-toolbox.register("select", tools.selStochasticUniversalSampling)
+toolbox.register("select", tools.selTournament, tournsize=3)
+# toolbox.register("select", tools.selStochasticUniversalSampling)
 toolbox.register("mate", tools.cxSimulatedBinaryBounded, low=BOUNDS_LOW, up=BOUNDS_HIGH, eta=CROWDING_FACTOR)
 toolbox.register("mutate", tools.mutPolynomialBounded, low=BOUNDS_LOW, up=BOUNDS_HIGH, eta=CROWDING_FACTOR, indpb=0.03)
 
