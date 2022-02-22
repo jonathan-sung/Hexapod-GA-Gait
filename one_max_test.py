@@ -20,7 +20,7 @@ ONE_MAX_LENGTH = 1000  # length of bit string to be optimized
 POPULATION_SIZE = 500
 P_CROSSOVER = 0.9  # probability for crossover
 P_MUTATION = 0.5  # probability for mutating an individual
-MAX_GENERATIONS = 100
+MAX_GENERATIONS = 200
 HALL_OF_FAME_SIZE = 5
 
 # set the random seed:
@@ -56,16 +56,16 @@ toolbox.register("evaluate", oneMaxFitness)
 # genetic operators:mutFlipBit
 
 # Tournament selection with tournament size of 3:
-# toolbox.register("select", tools.selTournament, tournsize=int(0.1 * 500))
+toolbox.register("select", tools.selTournament, tournsize=2)
 # toolbox.register("select", tools.selStochasticUniversalSampling)
-toolbox.register("select", tools.selStochasticUniversalSampling)
+# toolbox.register("select", tools.selStochasticUniversalSampling)
 
 # Single-point crossover:
 toolbox.register("mate", tools.cxTwoPoint)
 
 # Flip-bit mutation:
 # indpb: Independent probability for each attribute to be flipped
-toolbox.register("mutate", tools.mutFlipBit, indpb=3.0 / ONE_MAX_LENGTH)
+toolbox.register("mutate", tools.mutFlipBit, indpb=0.02)
 
 lastTime = time.time()
 

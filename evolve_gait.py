@@ -1,6 +1,7 @@
 from deap import base
 from deap import creator
 from deap import tools
+from deap import algorithms
 import random
 import seaborn as sns
 import numpy as np
@@ -13,12 +14,12 @@ DIMENSIONS = 3 + (h.SIZE_OF_MOTION_CHROMOSOME * h.MAX_MOTIONS_IN_SEQUENCE * h.NU
 BOUNDS_LOW = [0.1, 50, 0] + ((([0] * 6) + ([-2] * 12)) * 4 * 6)
 BOUNDS_HIGH = [12, 300, 1] + (([4] + [1] + ([1] * 4) + ([2] * 12)) * 4 * 6)
 
-POPULATION_SIZE = 100
-P_CROSSOVER = 1  # probability for crossover
-P_MUTATION = 0.5  # (try also 0.5) probability for mutating an individual
-MAX_GENERATIONS = 200
-HALL_OF_FAME_SIZE = int(0.02 * POPULATION_SIZE)
-CROWDING_FACTOR = 15.0  # crowding factor for crossover and mutation
+POPULATION_SIZE = 300
+P_CROSSOVER = 0.9  # probability for crossover
+P_MUTATION = 0.1  # (try also 0.5) probability for mutating an individual
+MAX_GENERATIONS = 100
+HALL_OF_FAME_SIZE = 30  # int(0.01 * POPULATION_SIZE)
+CROWDING_FACTOR = 20.0  # crowding factor for crossover and mutation
 
 toolbox = base.Toolbox()
 creator.create("FitnessCompound", base.Fitness, weights=(1.0, -1.0))
@@ -35,10 +36,12 @@ for i in range(DIMENSIONS):
 toolbox.register("individualCreator", tools.initCycle, creator.Individual, layer_size_attributes, n=1)
 toolbox.register("populationCreator", tools.initRepeat, list, toolbox.individualCreator)
 toolbox.register("evaluate", h.evaluateGait)
-toolbox.register("select", tools.selTournament, tournsize=3)
+toolbox.register("select", tools.selTournament, tournsize=2)
 # toolbox.register("select", tools.selStochasticUniversalSampling)
 toolbox.register("mate", tools.cxSimulatedBinaryBounded, low=BOUNDS_LOW, up=BOUNDS_HIGH, eta=CROWDING_FACTOR)
-toolbox.register("mutate", tools.mutPolynomialBounded, low=BOUNDS_LOW, up=BOUNDS_HIGH, eta=CROWDING_FACTOR, indpb=0.03)
+# toolbox.register("mate", tools.cxBlend, alpha=1.0)
+toolbox.register("mutate", tools.mutPolynomialBounded, low=BOUNDS_LOW, up=BOUNDS_HIGH, eta=CROWDING_FACTOR, indpb=1.0 / DIMENSIONS)
+# tools.cx
 
 
 # Genetic Algorithm flow:
@@ -51,6 +54,7 @@ def main():
     stats.register("avg", np.mean)
     hof = tools.HallOfFame(HALL_OF_FAME_SIZE)
     population, logbook = elitism.eaSimpleWithElitism(population, toolbox, cxpb=P_CROSSOVER, mutpb=P_MUTATION, ngen=MAX_GENERATIONS, stats=stats, halloffame=hof, verbose=True)
+    # population, logbook = algorithms.eaSimple(population, toolbox, cxpb=P_CROSSOVER, mutpb=P_MUTATION, ngen=MAX_GENERATIONS, stats=stats, halloffame=hof, verbose=True)
     best = hof.items[0]
     print("-- Best Individual = ", best)
     print("-- Best Fitness = ", best.fitness.values[0])
