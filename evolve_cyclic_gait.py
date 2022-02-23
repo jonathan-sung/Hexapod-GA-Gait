@@ -10,22 +10,22 @@ import hexapodengine2 as h
 import elitism
 import multiprocessing
 
-DIMENSIONS = 1 + h.LENGTH_OF_GAIT_STATE * (h.LENGTH_OF_SEQUENCE - 1)
-BOUNDS_LOW = [0] + ([0] + ([-h.servoRangeOfMotion] * h.NUM_OF_SERVOS)) * (h.LENGTH_OF_SEQUENCE - 1)
-BOUNDS_HIGH = [1] + ([1] + ([h.servoRangeOfMotion] * h.NUM_OF_SERVOS)) * (h.LENGTH_OF_SEQUENCE - 1)
+DIMENSIONS = 2 + h.LENGTH_OF_GAIT_STATE * (h.LENGTH_OF_SEQUENCE - 1)
+BOUNDS_LOW = [0] + [140] + ([0] + ([-h.servoRangeOfMotion] * h.NUM_OF_SERVOS)) * (h.LENGTH_OF_SEQUENCE - 1)
+BOUNDS_HIGH = [1] + [160] + ([1] + ([h.servoRangeOfMotion] * h.NUM_OF_SERVOS)) * (h.LENGTH_OF_SEQUENCE - 1)
 
-POPULATION_SIZE = 1000
+POPULATION_SIZE = 3000
 P_CROSSOVER = 0.9  # probability for crossover
-P_MUTATION = 0.9  # probability for mutating an individual
-MAX_GENERATIONS = 400
-HALL_OF_FAME_SIZE = 10  # int(0.01 * POPULATION_SIZE)
-CROWDING_FACTOR = 10.0  # crowding factor for crossover and mutation
-TOURN_SIZE = 8
-MUT_INDPB = 0.03
+P_MUTATION = 0.5  # probability for mutating an individual
+MAX_GENERATIONS = 1000
+HALL_OF_FAME_SIZE = 30
+CROWDING_FACTOR = 20.0  # crowding factor for crossover and mutation
+TOURN_SIZE = 2
+MUT_INDPB = 1.0 / DIMENSIONS
 print("GA Parameters", POPULATION_SIZE, P_CROSSOVER, P_MUTATION, MAX_GENERATIONS, HALL_OF_FAME_SIZE, CROWDING_FACTOR, DIMENSIONS, TOURN_SIZE, MUT_INDPB)
 
 toolbox = base.Toolbox()
-creator.create("FitnessCompound", base.Fitness, weights=(1.0, -0.5))
+creator.create("FitnessCompound", base.Fitness, weights=(1.0, -0.5, -0.5))
 creator.create("Individual", list, fitness=creator.FitnessCompound)
 
 for i in range(DIMENSIONS):

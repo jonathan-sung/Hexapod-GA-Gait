@@ -17,11 +17,11 @@ import multiprocessing
 ONE_MAX_LENGTH = 1000  # length of bit string to be optimized
 
 # Genetic Algorithm constants:
-POPULATION_SIZE = 10
+POPULATION_SIZE = 1000
 P_CROSSOVER = 0.9  # probability for crossover
-P_MUTATION = 0.9  # probability for mutating an individual
-MAX_GENERATIONS = 10000
-HALL_OF_FAME_SIZE = 1
+P_MUTATION = 0.5  # probability for mutating an individual
+MAX_GENERATIONS = 200
+HALL_OF_FAME_SIZE = 100
 
 # set the random seed:
 RANDOM_SEED = 42
@@ -56,7 +56,7 @@ toolbox.register("evaluate", oneMaxFitness)
 # genetic operators:mutFlipBit
 
 # Tournament selection with tournament size of 3:
-toolbox.register("select", tools.selTournament, tournsize=3)
+toolbox.register("select", tools.selTournament, tournsize=2)
 # toolbox.register("select", tools.selBest)
 # toolbox.register("select", tools.selStochasticUniversalSampling)
 # toolbox.register("select", tools.selStochasticUniversalSampling)
@@ -66,7 +66,7 @@ toolbox.register("mate", tools.cxTwoPoint)
 
 # Flip-bit mutation:
 # indpb: Independent probability for each attribute to be flipped
-toolbox.register("mutate", tools.mutFlipBit, indpb=0.01)
+toolbox.register("mutate", tools.mutFlipBit, indpb=1.0/ONE_MAX_LENGTH)
 
 lastTime = time.time()
 

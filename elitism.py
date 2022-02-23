@@ -62,5 +62,6 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
         if verbose:
             print(f'Gen {gen} | Time Elapsed: {time.time() - lastTime}')
             print(logbook.stream)
+            # print("HOF: ", halloffame.items)
 
     return population, logbook
