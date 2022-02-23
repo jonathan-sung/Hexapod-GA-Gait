@@ -29,7 +29,7 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
     record = stats.compile(population) if stats else {}
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
     if verbose:
-        print(f'Gen 0 | Time Elapsed: {time.time() - lastTime}')
+        # print(f'Gen 0 | Time Elapsed: {time.time() - lastTime}')
         print(logbook.stream)
 
     # Begin the generational process

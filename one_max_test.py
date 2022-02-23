@@ -17,11 +17,11 @@ import multiprocessing
 ONE_MAX_LENGTH = 1000  # length of bit string to be optimized
 
 # Genetic Algorithm constants:
-POPULATION_SIZE = 500
+POPULATION_SIZE = 10
 P_CROSSOVER = 0.9  # probability for crossover
-P_MUTATION = 0.5  # probability for mutating an individual
-MAX_GENERATIONS = 200
-HALL_OF_FAME_SIZE = 5
+P_MUTATION = 0.9  # probability for mutating an individual
+MAX_GENERATIONS = 10000
+HALL_OF_FAME_SIZE = 1
 
 # set the random seed:
 RANDOM_SEED = 42
@@ -56,7 +56,8 @@ toolbox.register("evaluate", oneMaxFitness)
 # genetic operators:mutFlipBit
 
 # Tournament selection with tournament size of 3:
-toolbox.register("select", tools.selTournament, tournsize=2)
+toolbox.register("select", tools.selTournament, tournsize=3)
+# toolbox.register("select", tools.selBest)
 # toolbox.register("select", tools.selStochasticUniversalSampling)
 # toolbox.register("select", tools.selStochasticUniversalSampling)
 
@@ -65,15 +66,15 @@ toolbox.register("mate", tools.cxTwoPoint)
 
 # Flip-bit mutation:
 # indpb: Independent probability for each attribute to be flipped
-toolbox.register("mutate", tools.mutFlipBit, indpb=0.02)
+toolbox.register("mutate", tools.mutFlipBit, indpb=0.01)
 
 lastTime = time.time()
 
 
 # Genetic Algorithm flow:
 def main():
-    pool = multiprocessing.Pool()
-    toolbox.register("map", pool.map)
+    # pool = multiprocessing.Pool()
+    # toolbox.register("map", pool.map)
 
     # create initial population (generation 0):
     population = toolbox.populationCreator(n=POPULATION_SIZE)
@@ -97,7 +98,7 @@ def main():
     # extract statistics:
     maxFitnessValues, meanFitnessValues = logbook.select("max", "avg")
 
-    pool.close()
+    # pool.close()
     # plot statistics:
     sns.set_style("whitegrid")
     plt.plot(maxFitnessValues, color='red')
