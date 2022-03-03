@@ -1,8 +1,5 @@
 
-individual = list(range(20))
-gaitChromosome = individual[2:]
-print(gaitChromosome)
-print(individual)
-individual[4] = 99
-print(gaitChromosome)
-print(individual)
+JOINT_INDICES = [x for x in range(0, 24) if (x + 1) % 4 != 0]
+FEET_INDEXES = [x for x in range(0, 24) if (x + 1) % 4 == 0]
+print(JOINT_INDICES)
+print(FEET_INDEXES)

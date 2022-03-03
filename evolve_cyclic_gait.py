@@ -13,10 +13,10 @@ import math
 import time
 
 DIMENSIONS = 2 + h.LENGTH_OF_GAIT_STATE * (h.LENGTH_OF_SEQUENCE - 1)
-BOUNDS_LOW = [0] + [140] + ([0] + ([-h.servoRangeOfMotion] * h.NUM_OF_SERVOS)) * (h.LENGTH_OF_SEQUENCE - 1)
+BOUNDS_LOW = [0.2] + [140] + ([0.2] + ([-h.servoRangeOfMotion] * h.NUM_OF_SERVOS)) * (h.LENGTH_OF_SEQUENCE - 1)
 BOUNDS_HIGH = [1] + [160] + ([1] + ([h.servoRangeOfMotion] * h.NUM_OF_SERVOS)) * (h.LENGTH_OF_SEQUENCE - 1)
 
-POPULATION_SIZE = 3000
+POPULATION_SIZE = 6000
 P_CROSSOVER = 0.9  # probability for crossover
 P_MUTATION = 0.5  # probability for mutating an individual
 MAX_GENERATIONS = 1000
