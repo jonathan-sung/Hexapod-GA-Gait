@@ -16,11 +16,15 @@ def centreAllLegs(ser):
 def curlAllLegs(ser):
     servoIDs_R = [1, 2, 5, 6, 9, 10]
     servoIDs_L = [17, 18, 21, 22, 25, 26]
+    servoIDs_M = [0, 4, 8, 16, 20, 24]
     for i in servoIDs_R:
         command = f'#{i}P750\r'.encode('utf-8')
         ser.write(command)
     for i in servoIDs_L:
         command = f'#{i}P2250\r'.encode('utf-8')
+        ser.write(command)
+    for i in servoIDs_M:
+        command = f'#{i}P1500\r'.encode('utf-8')
         ser.write(command)
 
 def radToPwm(angle):
