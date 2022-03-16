@@ -16,7 +16,7 @@ currentTotal = [0] * NUM_OF_METRICS
 listOfAvgFitness = []
 currentGen = 0
 
-with open("C:/Users/Jonathan/Desktop/cyclic_log_6000_pop.txt") as infile:
+with open("C:/Users/Jonathan/Desktop/tripod_cyclic_log_1.txt") as infile:
     for line in infile:
         x = re.search("\((\d+\.\d+, ){" + str(NUM_OF_METRICS - 1) + "}\d+\.\d+\)", line)
         y = re.search("^\d+\s+", line)
@@ -32,6 +32,6 @@ with open("C:/Users/Jonathan/Desktop/cyclic_log_6000_pop.txt") as infile:
             resetCounters()
             currentGen += 1
     df = pd.DataFrame(listOfAvgFitness, columns=["Distance", "Angle", "Stability", "Height", "Leg Collision", "Avg Fitness"])
-    df.to_csv("C:/Users/Jonathan/Desktop/output_6000.csv")
+    df.to_csv("C:/Users/Jonathan/Desktop/output_tripod.csv")
     print(df)
 plt.show()

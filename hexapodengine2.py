@@ -167,7 +167,7 @@ def collidingLegs():
 
 
 def runGait(individual):
-    # ssc32 = serial.Serial('COM5', 115200, timeout=2)  # open serial port
+    ssc32 = serial.Serial('COM5', 115200, timeout=2)  # open serial port
     lastTime = time.time()
     global firstCycleComplete
     dt = 0
@@ -179,10 +179,10 @@ def runGait(individual):
     resetEnvironment()
     p.setRealTimeSimulation(1)
     while True:
-        # p.setJointMotorControlArray(hexapod_ID, JOINT_INDEXES, p.POSITION_CONTROL, targetPositions=readGait(dt, gaitChromosome), forces=([force] * 18))
-        p.setJointMotorControlArray(hexapod_ID, JOINT_INDEXES, p.POSITION_CONTROL, targetPositions=sinusoidalTestGait(dt), forces=([force] * 18))
+        p.setJointMotorControlArray(hexapod_ID, JOINT_INDEXES, p.POSITION_CONTROL, targetPositions=readGait(dt, gaitChromosome), forces=([force] * 18))
+        # p.setJointMotorControlArray(hexapod_ID, JOINT_INDEXES, p.POSITION_CONTROL, targetPositions=sinusoidalTestGait(dt), forces=([force] * 18))
         # p.setJointMotorControlArray(hexapod_ID, JOINT_INDEXES, p.POSITION_CONTROL, targetPositions=read_debug_parameters(), forces=([force] * 18))
-        # updateRealServos(ssc32, 100)
+        updateRealServos(ssc32, 100)
         now = time.time()
         dt += now - lastTime
         lastTime = now
@@ -196,7 +196,7 @@ def sinusoidalTestGait(t):
     coxa1 = (math.pi / 4) * math.sin((2 * t) + 0)
     femur1 = 0.2 * math.sin((2 * t) + ((3 * math.pi) / 2))
     tibia1 = 1.3 * math.sin((0 * t) + ((3 * math.pi) / 2))
-    return [coxa0, femur0, tibia0, coxa1, femur1, tibia1, coxa0, femur0, tibia0] + (-1 * [coxa0, femur0, tibia0, coxa1, femur1, tibia1, coxa0, femur0, tibia0])
+    return [coxa0, femur0, tibia0, coxa1, femur1, tibia1, coxa0, femur0, tibia0] + [-coxa0, -femur0, -tibia0, -coxa1, -femur1, -tibia1, -coxa0, -femur0, -tibia0]
 
 
 def evaluateGait(individual):

@@ -13,23 +13,23 @@ import math
 import time
 
 DIMENSIONS = 2 + h.LENGTH_OF_GAIT_STATE * (h.LENGTH_OF_SEQUENCE - 1)
-BOUNDS_LOW = [0.2] + [140] + ([0.2] + ([-h.servoRangeOfMotion] * h.NUM_OF_SERVOS)) * (h.LENGTH_OF_SEQUENCE - 1)
-BOUNDS_HIGH = [1] + [160] + ([1] + ([h.servoRangeOfMotion] * h.NUM_OF_SERVOS)) * (h.LENGTH_OF_SEQUENCE - 1)
+BOUNDS_LOW = [0.2] + [100] + ([0.2] + ([-h.servoRangeOfMotion] * h.NUM_OF_SERVOS)) * (h.LENGTH_OF_SEQUENCE - 1)
+BOUNDS_HIGH = [1] + [130] + ([1] + ([h.servoRangeOfMotion] * h.NUM_OF_SERVOS)) * (h.LENGTH_OF_SEQUENCE - 1)
 
-POPULATION_SIZE = 6000
+POPULATION_SIZE = 1000
 P_CROSSOVER = 0.9  # probability for crossover
-P_MUTATION = 0.5  # probability for mutating an individual
-MAX_GENERATIONS = 1000
+P_MUTATION = 0.9  # probability for mutating an individual
+MAX_GENERATIONS = 700
 HALL_OF_FAME_SIZE = int(0.1 * POPULATION_SIZE)
 CROWDING_FACTOR = 20.0  # crowding factor for crossover and mutation
 TOURN_SIZE = 2
-MUT_INDPB = 1.0 / DIMENSIONS
+MUT_INDPB = 10.0 / DIMENSIONS
 DISTANCE_WEIGHT = 1.0
 ANGLE_WEIGHT = -1.0
 STABILITY_WEIGHT = 1.0
 HEIGHT_WEIGHT = -1.0
 
-estimatedTime = (0.115 * POPULATION_SIZE * MAX_GENERATIONS) / (60.0 * 60.0)
+estimatedTime = (0.12 * POPULATION_SIZE * MAX_GENERATIONS) / (60.0 * 60.0)
 print(f"Estimated Evolution Time: {estimatedTime} hours")
 print("GA Parameters", POPULATION_SIZE, P_CROSSOVER, P_MUTATION, MAX_GENERATIONS, HALL_OF_FAME_SIZE, CROWDING_FACTOR, DIMENSIONS, TOURN_SIZE, MUT_INDPB, DISTANCE_WEIGHT, ANGLE_WEIGHT, STABILITY_WEIGHT)
 
