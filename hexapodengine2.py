@@ -15,10 +15,10 @@ def radToPwm(angle):
 def updateRealServos(ser, t):
     # right legs
     ser.write(
-        f'#0P{radToPwm(-p.getJointState(hexapod_ID, 8)[0])}T{t}#1P{radToPwm(p.getJointState(hexapod_ID, 9)[0])}T{t}#2P{radToPwm(-p.getJointState(hexapod_ID, 10)[0])}T{t}\r'.encode(
+        f'#0P{radToPwm(-p.getJointState(hexapod_ID, 8)[0])}T{t}#1P{radToPwm(p.getJointState(hexapod_ID, 9)[0])}T{t}#2P{radToPwm(-p.getJointState(hexapod_ID, 10)[0])-100}T{t}\r'.encode(
             'utf-8'))
     ser.write(
-        f'#4P{radToPwm(-p.getJointState(hexapod_ID, 4)[0])}T{t}#5P{radToPwm(p.getJointState(hexapod_ID, 5)[0])}T{t}#6P{radToPwm(-p.getJointState(hexapod_ID, 6)[0])}T{t}\r'.encode(
+        f'#4P{radToPwm(-p.getJointState(hexapod_ID, 4)[0])}T{t}#5P{radToPwm(p.getJointState(hexapod_ID, 5)[0])}T{t}#6P{radToPwm(-p.getJointState(hexapod_ID, 6)[0])+100}T{t}\r'.encode(
             'utf-8'))
     ser.write(
         f'#8P{radToPwm(-p.getJointState(hexapod_ID, 0)[0])}T{t}#9P{radToPwm(p.getJointState(hexapod_ID, 1)[0])}T{t}#10P{radToPwm(-p.getJointState(hexapod_ID, 2)[0])}T{t}\r'.encode(
@@ -26,13 +26,13 @@ def updateRealServos(ser, t):
 
     # left legs
     ser.write(
-        f'#24P{radToPwm(-p.getJointState(hexapod_ID, 12)[0])}T{t}#25P{radToPwm(p.getJointState(hexapod_ID, 13)[0])}T{t}#26P{radToPwm(-p.getJointState(hexapod_ID, 14)[0])}T{t}\r'.encode(
+        f'#24P{radToPwm(-p.getJointState(hexapod_ID, 12)[0])}T{t}#25P{radToPwm(p.getJointState(hexapod_ID, 13)[0])}T{t}#26P{radToPwm(-p.getJointState(hexapod_ID, 14)[0])+100}T{t}\r'.encode(
             'utf-8'))
     ser.write(
         f'#20P{radToPwm(-p.getJointState(hexapod_ID, 16)[0])}T{t}#21P{radToPwm(p.getJointState(hexapod_ID, 17)[0])}T{t}#22P{radToPwm(-p.getJointState(hexapod_ID, 18)[0])}T{t}\r'.encode(
             'utf-8'))
     ser.write(
-        f'#16P{radToPwm(-p.getJointState(hexapod_ID, 20)[0])}T{t}#17P{radToPwm(p.getJointState(hexapod_ID, 21)[0])}T{t}#18P{radToPwm(-p.getJointState(hexapod_ID, 22)[0])}T{t}\r'.encode(
+        f'#16P{radToPwm(-p.getJointState(hexapod_ID, 20)[0])}T{t}#17P{radToPwm(p.getJointState(hexapod_ID, 21)[0])}T{t}#18P{radToPwm(-p.getJointState(hexapod_ID, 22)[0])-50}T{t}\r'.encode(
             'utf-8'))
 
 
@@ -167,7 +167,7 @@ def collidingLegs():
 
 
 def runGait(individual):
-    ssc32 = serial.Serial('COM5', 115200, timeout=2)  # open serial port
+    global REAL_HEXAPOD_CONNECTED
     lastTime = time.time()
     global firstCycleComplete
     dt = 0
@@ -177,16 +177,56 @@ def runGait(individual):
     gaitChromosome = individual[2:]
     gaitChromosome = ([initDuration] + [0] * NUM_OF_SERVOS) + gaitChromosome
     resetEnvironment()
+    stabilityScore = 0
+    heightScore = 0
+    collisionScore = 0
+    sampleCounter = 0
     p.setRealTimeSimulation(1)
     while True:
-        p.setJointMotorControlArray(hexapod_ID, JOINT_INDEXES, p.POSITION_CONTROL, targetPositions=readGait(dt, gaitChromosome), forces=([force] * 18))
-        # p.setJointMotorControlArray(hexapod_ID, JOINT_INDEXES, p.POSITION_CONTROL, targetPositions=sinusoidalTestGait(dt), forces=([force] * 18))
-        # p.setJointMotorControlArray(hexapod_ID, JOINT_INDEXES, p.POSITION_CONTROL, targetPositions=read_debug_parameters(), forces=([force] * 18))
-        updateRealServos(ssc32, 100)
+        if CONFIG_MODE:
+            p.setJointMotorControlArray(hexapod_ID, JOINT_INDEXES, p.POSITION_CONTROL, targetPositions=read_debug_parameters(), forces=([force] * 18))
+        else:
+            p.setJointMotorControlArray(hexapod_ID, JOINT_INDEXES, p.POSITION_CONTROL, targetPositions=readGait(dt, gaitChromosome), forces=([force] * 18))
+        if REAL_HEXAPOD_CONNECTED:
+            updateRealServos(ssc32, 100)
+
+        # Evaluation Metrics
+        hexapodBasePosAndOrn = p.getBasePositionAndOrientation(hexapod_ID)
+        currentStability = sum([abs(angle) for angle in list(p.getEulerFromQuaternion(hexapodBasePosAndOrn[1]))])
+        currentHeight = abs(1.375 - hexapodBasePosAndOrn[0][2])
+        stabilityScore += currentStability
+        heightScore += currentHeight
+        collisionScore += collidingLegs()
+        sampleCounter += 1
+
+        # timing variables
         now = time.time()
         dt += now - lastTime
         lastTime = now
-        # print(collidingLegs())
+
+        # Finish evaluation after 12.5 seconds
+        if dt >= 12.5:
+            break
+
+    hexapodBasePosAndOrn = p.getBasePositionAndOrientation(hexapod_ID)
+    currentPosition = hexapodBasePosAndOrn[0]
+    distance = hexapodBasePosAndOrn[0][1]
+    straightness = abs(angleBetweenVectors(np.array([0, 1]), np.array([currentPosition[0], currentPosition[1]])))
+    avgHeight = abs(heightScore / sampleCounter)
+    avgStability = stabilityScore / sampleCounter
+    avgNumOfCollisions = collisionScore / sampleCounter
+    fitness_distance = distance / 100.0
+    fitness_straight = 1.0 - (straightness / math.pi)
+    fitness_stability = inverseCurve(avgStability, 1)
+    fitness_height = inverseCurve(avgHeight, 1)
+    fitness_collisions = round(1 - avgNumOfCollisions, 2)
+    fitness_total = (fitness_distance + fitness_straight + fitness_stability + fitness_height + fitness_collisions) / 5.0
+    line = f'ID: {UNIQUE_THREAD_ID} | Time Elapsed: {dt} | Evaluation: {fitness_distance, fitness_straight, fitness_stability, fitness_height, fitness_collisions, fitness_total} | Chromosome: {individual}'
+    print(line)
+    with open('C:/Users/Jonathan/Desktop/results_normal_cyclic.txt', 'a') as f:
+        f.write(line)
+        f.write('\n')
+    return fitness_total
 
 
 def sinusoidalTestGait(t):
@@ -265,6 +305,12 @@ STARTING_HEIGHT = 1.375
 STARTING_Y = 0.01
 TARGET_HEIGHT = STARTING_HEIGHT
 firstCycleComplete = False
+REAL_HEXAPOD_CONNECTED = False
+CONFIG_MODE = False
+ssc32 = None
+if REAL_HEXAPOD_CONNECTED:
+    ssc32 = serial.Serial('COM3', 115200, timeout=2)  # open serial port
+
 control_IDs = []
 
 # PyBullet Init

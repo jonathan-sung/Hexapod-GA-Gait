@@ -31,7 +31,7 @@ def radToPwm(angle):
     return int(((2000 * angle) / math.pi) + 1500)
 
 
-ssc32 = serial.Serial('COM5', 115200, timeout=2)  # open serial port
+ssc32 = serial.Serial('COM3', 115200, timeout=2)  # open serial port
 #centreAllLegs(ssc32)
 curlAllLegs(ssc32)
 ssc32.close()  # close port

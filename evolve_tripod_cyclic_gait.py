@@ -16,14 +16,14 @@ DIMENSIONS = 2 + h.LENGTH_OF_GAIT_STATE * (h.LENGTH_OF_SEQUENCE - 1)
 BOUNDS_LOW = [0.2] + [100] + ([0.2] + ([-h.servoRangeOfMotion] * h.NUM_OF_SERVOS)) * (h.LENGTH_OF_SEQUENCE - 1)
 BOUNDS_HIGH = [1] + [130] + ([1] + ([h.servoRangeOfMotion] * h.NUM_OF_SERVOS)) * (h.LENGTH_OF_SEQUENCE - 1)
 
-POPULATION_SIZE = 1000
+POPULATION_SIZE = 1200
 P_CROSSOVER = 0.9  # probability for crossover
 P_MUTATION = 0.9  # probability for mutating an individual
-MAX_GENERATIONS = 700
+MAX_GENERATIONS = 300
 HALL_OF_FAME_SIZE = int(0.1 * POPULATION_SIZE)
 CROWDING_FACTOR = 20.0  # crowding factor for crossover and mutation
 TOURN_SIZE = 2
-MUT_INDPB = 10.0 / DIMENSIONS
+MUT_INDPB = 1.0 / DIMENSIONS
 DISTANCE_WEIGHT = 1.0
 ANGLE_WEIGHT = -1.0
 STABILITY_WEIGHT = 1.0
